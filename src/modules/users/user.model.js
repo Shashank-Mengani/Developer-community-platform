@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import bcrypt from 'bcrypt';
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -71,7 +71,6 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }],
-
     following: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
@@ -88,7 +87,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         select: false
     },
-
     emailVerificationOTPExpiry: {
         type: Date,
         select: false
@@ -99,12 +97,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         select: false
     },
-
     passwordResetExpiry: {
         type: Date,
         select: false
     },
-
     passwordChangedAt: {
         type: Date,
         select: false
@@ -114,6 +110,7 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
+//virtual fields
 UserSchema.virtual('followerCount').get(function() {
     return this.followers.length;
 });
