@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './database/db.js';
 import authRoute from './modules/auth/auth.routes.js'
 import cookieParser from 'cookie-parser';
+import userRoute from './modules/users/user.route.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', authRoute);
+app.use('/user', userRoute);
 
 app.listen(PORT, () => {
     console.log(`server is running on http://localhost:${PORT}`);
