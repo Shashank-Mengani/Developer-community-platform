@@ -1,21 +1,45 @@
 import User from "./user.model.js";
 
-export const createPost = async(req, res) => {
+export const getPost = async(req, res) => {
     try {
-        const { avatar, bio, role } = req.body;
+        const { id } = req.params;
 
-        const user = await User.create({
-            avatar: avatar,
-            bio: bio,
-            role: role
-        });
+        const user = await User.findById(id)
+            .select("-password");
 
-        res.status(201).json({
-            message: "created post",
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "get post",
             data: user
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error "});
+    }
+}
+
+export const updateProfile = async(req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByIdAndUpdate(id, {
+            avatar: req.body.avatar,
+            bio: req.body.bio,
+            reputation: req.body.reputation
+        }, { new: true }).select("-password");
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            data: updateProfile
+        });        
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
