@@ -27,11 +27,7 @@ export const updateProfile = async(req, res) => {
     try {
         const { id } = req.params;
 
-        const user = await User.findByIdAndUpdate(id, {
-            avatar: req.body.avatar,
-            bio: req.body.bio,
-            reputation: req.body.reputation
-        }, { new: true }).select("-password");
+        const user = await User.findByIdAndUpdate(id, req.body, { new: true }).select("-password");
 
         res.status(200).json({
             message: "Profile updated successfully",
