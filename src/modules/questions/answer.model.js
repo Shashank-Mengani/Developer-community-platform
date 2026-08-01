@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Question from "./question.model";
+import Question from "./question.model.js";
 
 const answerSchema = new mongoose.Schema({
     body: {
