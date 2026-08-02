@@ -32,3 +32,34 @@ export const createAnswer = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const getAnswer = async (req, res) => {
+    try {
+        const answer = await Answer.find();
+
+        res.status(200).json({
+            message: "Fetched answers succesfully",
+            data: answer
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const getAnswerById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const answer = await Answer.findById(id);
+
+        res.status(200).json({
+            message: "Fetched answer succesfully",
+            data: answer
+        });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
