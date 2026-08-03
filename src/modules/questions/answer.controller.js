@@ -63,3 +63,23 @@ export const getAnswerById = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const updateAnswer = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const answer = await Answer.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
+        res.status(200).json({
+            message: "Answer updated successfully",
+            data: answer
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

@@ -1,0 +1,168 @@
+developer-community-platform/
+│
+├── src/
+│   │
+│   ├── config/
+│   │   ├── db.js
+│   │   ├── jwt.js
+│   │   └── cloudinary.js (optional)
+│   │
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── user.controller.js
+│   │   ├── question.controller.js
+│   │   ├── answer.controller.js
+│   │   ├── comment.controller.js
+│   │   ├── tag.controller.js
+│   │   ├── vote.controller.js
+│   │   ├── bookmark.controller.js
+│   │   └── notification.controller.js
+│   │
+│   ├── models/
+│   │   ├── user.model.js
+│   │   ├── question.model.js
+│   │   ├── answer.model.js
+│   │   ├── comment.model.js
+│   │   ├── tag.model.js
+│   │   ├── vote.model.js
+│   │   ├── bookmark.model.js
+│   │   └── notification.model.js
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── user.routes.js
+│   │   ├── question.routes.js
+│   │   ├── answer.routes.js
+│   │   ├── comment.routes.js
+│   │   ├── tag.routes.js
+│   │   ├── vote.routes.js
+│   │   ├── bookmark.routes.js
+│   │   ├── notification.routes.js
+│   │   └── index.js
+│   │
+│   ├── middleware/
+│   │   ├── auth.middleware.js
+│   │   ├── error.middleware.js
+│   │   ├── upload.middleware.js
+│   │   └── validate.middleware.js
+│   │
+│   ├── services/ (optional)
+│   │   ├── auth.service.js
+│   │   ├── question.service.js
+│   │   ├── answer.service.js
+│   │   └── notification.service.js
+│   │
+│   ├── utils/
+│   │   ├── ApiError.js
+│   │   ├── ApiResponse.js
+│   │   ├── generateToken.js
+│   │   └── pagination.js
+│   │
+│   ├── validators/ (optional)
+│   │   ├── auth.validator.js
+│   │   ├── question.validator.js
+│   │   └── answer.validator.js
+│   │
+│   ├── app.js
+│   └── server.js
+│
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
+
+Authentication
+    POST   /auth/register
+    POST   /auth/login
+    POST   /auth/logout
+    POST   /auth/refresh-token
+    POST   /auth/forgot-password
+    POST   /auth/reset-password
+    GET    /auth/me
+
+Users
+    GET    /users
+    GET    /users/:id
+    PUT    /users/:id
+    DELETE /users/:id
+
+    GET    /users/:id/questions
+    GET    /users/:id/answers
+    GET    /users/:id/bookmarks
+    GET    /users/:id/profile
+
+Questions
+    POST   /questions
+    GET    /questions
+    GET    /questions/:id
+    PUT    /questions/:id
+    DELETE /questions/:id
+
+    GET    /questions/search?q=javascript
+    GET    /questions/tag/:tag
+    GET    /questions/user/:userId
+
+    PATCH  /questions/:id/views
+    POST   /questions/:id/vote  
+
+Answers
+    POST   /questions/:questionId/answers
+    GET    /questions/:questionId/answers
+
+    GET    /answers/:id
+    PUT    /answers/:id
+    DELETE /answers/:id
+
+    POST   /answers/:id/vote
+    PATCH  /answers/:id/accept
+    PATCH  /answers/:id/unaccept
+
+Comments
+    POST   /questions/:id/comments
+    GET    /questions/:id/comments
+
+    POST   /answers/:id/comments
+    GET    /answers/:id/comments
+
+    PUT    /comments/:id
+    DELETE /comments/:id
+
+vote
+    POST /questions/:id/vote
+    POST /answers/:id/vote
+    GET /questions/:id/votes
+    GET /answers/:id/votes
+
+Tags
+    POST   /tags
+    GET    /tags
+    GET    /tags/:id
+    PUT    /tags/:id
+    DELETE /tags/:id
+
+Bookmarks
+    POST   /questions/:id/bookmark
+    DELETE /questions/:id/bookmark
+    GET    /users/:id/bookmarks
+
+Notifications
+    GET    /notifications
+    PATCH  /notifications/:id/read
+    DELETE /notifications/:id
+
+Admin
+    GET    /admin/users
+    GET    /admin/questions
+    GET    /admin/reports
+
+    DELETE /admin/users/:id
+    DELETE /admin/questions/:id
+    DELETE /admin/answers/:id
+
+Search
+    GET /search?q=react
+    GET /search?q=node&type=questions
+    GET /search?q=javascript&type=users
+
+Dashboard
+    GET /dashboard

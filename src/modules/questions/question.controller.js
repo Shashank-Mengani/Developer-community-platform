@@ -56,7 +56,7 @@ export const getQuestionById = async (req, res) => {
     }
 }
 
-export const updateById = async (req, res) => {
+export const updateQuestion = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -69,5 +69,20 @@ export const updateById = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+export const deleteQuestion = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const question = await Question.findByIdAndDelete(id);
+        if(!question){
+            return res.status(404).json({ message: "Question not found" });
+        }
+        res.status(200).json({ message: "Question deleted successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
