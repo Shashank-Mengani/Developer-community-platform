@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAnswer, getAnswer, getAnswerById, updateAnswer } from './answer.controller.js';
+import { createAnswer, getAnswer, getAnswerById, updateAnswer } from '../controllers/answer.controller.js';
 
 const router = express.Router();
 
