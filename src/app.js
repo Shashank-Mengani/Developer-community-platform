@@ -5,6 +5,7 @@ import userRoute from './routes/user.route.js';
 import questionRoute from './routes/question.routes.js';
 import answerRoute from './routes/answer.routes.js';
 import voteRoutes from './routes/vote.route.js'
+import commentRoutes from './routes/comment.route.js'
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.use('/user', userRoute);
 app.use('/question', questionRoute);
 app.use('/answer', answerRoute);
 app.use('/votes', voteRoutes);
+app.use('/comments', commentRoutes);
 
 export default app;
