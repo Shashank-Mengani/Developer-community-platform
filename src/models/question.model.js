@@ -33,6 +33,14 @@ const questionSchema = new mongoose.Schema({
         default: 0
     },
 
+    tags: [
+        {
+        type: String,
+        trim: true,
+        lowercase: true,
+        }
+    ],
+
     acceptAnswer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Answer"
