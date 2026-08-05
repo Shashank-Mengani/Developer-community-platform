@@ -6,6 +6,7 @@ import questionRoute from './routes/question.routes.js';
 import answerRoute from './routes/answer.routes.js';
 import voteRoutes from './routes/vote.route.js'
 import commentRoutes from './routes/comment.route.js'
+import bookmarkRoutes from './routes/bookmark.route.js'
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use('/question', questionRoute);
 app.use('/answer', answerRoute);
 app.use('/votes', voteRoutes);
 app.use('/comments', commentRoutes);
+app.use('/bookmark', bookmarkRoutes);
 
 export default app;
