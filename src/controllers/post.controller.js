@@ -29,8 +29,27 @@ export const createPost = async (req, res) => {
     }
 }
 
-export const getPosts = async (req, res) => {
-    
+export const getPostsByUser = async (req, res) => {
+    try {
+        const userId = req.user;
+
+        const posts = await Post.find({
+            author: userId
+        }).populate("author", "name username");
+
+        if(!posts){
+            return res.status(404).json({ message: "Posts not found" });
+        }
+
+        res.status(200).json({
+            message: "User posts fetched successfully",
+            data: posts
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 }
 
 export const updatePost = async (req, res) => {
