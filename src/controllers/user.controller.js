@@ -1,5 +1,6 @@
 import { use } from "react";
 import User from "../models/user.model.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const getPost = async(req, res) => {
     try {
@@ -40,6 +41,45 @@ export const updateProfile = async(req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const uploadProfileImage = async (req, res) => {
+  try {
+
+    console.log("USER:", req.user);
+    console.log("FILE:", req.file);
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No image uploaded"
+      });
+    }
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "devpost/avatars-images"
+    });
+
+    console.log("CLOUDINARY:", result);
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        profileImage: result.secure_url
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Avatar image uploaded successfully",
+      profileImage: user.profileImage
+    });
+
+  } catch (error) {
+    console.log("ERROR:", error);
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 
 export const followUser = async (req, res) => {
     try {

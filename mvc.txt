@@ -13,7 +13,7 @@ developer-community-platform/
 │   │   ├── question.controller.js
 │   │   ├── answer.controller.js
 │   │   ├── comment.controller.js
-│   │   ├── tag.controller.js
+│   │   ├
 │   │   ├── vote.controller.js
 │   │   ├── bookmark.controller.js
 │   │   └── notification.controller.js
@@ -23,7 +23,7 @@ developer-community-platform/
 │   │   ├── question.model.js
 │   │   ├── answer.model.js
 │   │   ├── comment.model.js
-│   │   ├── tag.model.js
+│   │   ├
 │   │   ├── vote.model.js
 │   │   ├── bookmark.model.js
 │   │   └── notification.model.js
@@ -34,7 +34,7 @@ developer-community-platform/
 │   │   ├── question.routes.js
 │   │   ├── answer.routes.js
 │   │   ├── comment.routes.js
-│   │   ├── tag.routes.js
+│   │   ├
 │   │   ├── vote.routes.js
 │   │   ├── bookmark.routes.js
 │   │   ├── notification.routes.js
@@ -132,13 +132,6 @@ vote
     POST /answers/:id/vote
     GET /questions/:id/votes
     GET /answers/:id/votes
-
-Tags
-    POST   /tags
-    GET    /tags
-    GET    /tags/:id
-    PUT    /tags/:id
-    DELETE /tags/:id
 
 Bookmarks
     POST   /questions/:id/bookmark
