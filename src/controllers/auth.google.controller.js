@@ -30,8 +30,7 @@ export const googleLogin = async (req, res) => {
                     name,
                     email: email.toLowerCase(),
                     googleId,
-                    isverified: true,
-                    avatar: ""
+                    isverified: true
                 });
             }
         }
