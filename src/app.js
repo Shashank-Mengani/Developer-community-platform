@@ -8,11 +8,15 @@ import voteRoutes from './routes/vote.route.js';
 import commentRoutes from './routes/comment.route.js';
 import bookmarkRoutes from './routes/bookmark.route.js';
 import postRoutes from './routes/post.route.js';
+import googleRoutes from './routes/google.auth.route.js';
+import passport from './config/passport.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(passport.initialize());
 
 app.use('/api', authRoute);
 app.use('/user', userRoute);
@@ -22,5 +26,6 @@ app.use('/votes', voteRoutes);
 app.use('/comments', commentRoutes);
 app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);
+app.use('/auth', googleRoutes);
 
 export default app;

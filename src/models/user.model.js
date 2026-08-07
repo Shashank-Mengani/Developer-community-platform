@@ -20,18 +20,14 @@ const UserSchema = new mongoose.Schema({
 
     password: {
         type: String,
-        required: true,
         minlength: [6, "password must be atleast 6 character long"]
     },
 
-    createdAt: {
-        type: Date,
-        default: Date.now()
-    },
-
-    isverified: {
-        type: Boolean,
-        default: false
+    googleId: {
+        type: String,
+        trim: true,
+        sparse: true,
+        unique: true
     },
 
     avatar: {
@@ -53,7 +49,7 @@ const UserSchema = new mongoose.Schema({
 
     isverified: {
         type: Boolean,
-        default: true
+        default: false
     },
 
     isActive: {
@@ -121,12 +117,15 @@ UserSchema.virtual('followingCount').get(function() {
 
 //Pre-save hook
 UserSchema.pre('save', async function () {
-    if(!this.isModified('password')) return;
+    if(!this.isModified('password') || !this.password) return;
     this.password = await bcrypt.hash(this.password, 12);
 });
 
 //Instance method: compare password
 UserSchema.methods.comparePassword = async function(candidate){
+    if(!this.password){
+        return false;
+    }
     return bcrypt.compare(candidate, this.password)
 }
 
