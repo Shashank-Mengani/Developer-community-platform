@@ -10,6 +10,7 @@ import bookmarkRoutes from './routes/bookmark.route.js';
 import postRoutes from './routes/post.route.js';
 import googleRoutes from './routes/google.auth.route.js';
 import passport from './config/passport.js';
+import notificationRoutes from './routes/notification.route.js';
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use('/comments', commentRoutes);
 app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);
 app.use('/auth', googleRoutes);
+app.use('/posts', notificationRoutes);
 
 export default app;
