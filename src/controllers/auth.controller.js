@@ -6,26 +6,7 @@ import { generateToken } from "../utils/jwt.token.js";
 export const signUp = async(req, res) => {
     try {
         const { name, email, password } = req.body;
-
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                message: "All fields are required"
-            });
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!emailRegex.test(email)){
-            return res.status(400).json({
-                message: "Invalid email format"
-            });
-        }
-
-        if(password.length <= 5){
-            return res.status(400).json({
-                message: "password must me at least 5 characters"
-            });
-        }
-
+        
         const existingUser = await User.findOne({ email: email.toLowerCase() });
 
         if(existingUser){
