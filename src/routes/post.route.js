@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getPostById, getPostsByUser, reactToPost, updatePost } from '../controllers/post.controller.js';
+import { createPost, deletePost, getPostById, getPostsByUser, reactToPost, updatePost } from '../controllers/post.controller.js';
 import { authenticate } from '../middleware/auth.protect.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { createPostSchema } from '../validators/post.validator.js';
@@ -16,5 +16,7 @@ postRoute.get('/user/:id', authenticate, getPostsByUser);
 postRoute.get('/:id/post', authenticate, getPostById);
 
 postRoute.put('/:id', authenticate, updatePost);
+
+postRoute.delete('/:id/post', authenticate, deletePost);
 
 export default postRoute;

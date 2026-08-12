@@ -39,24 +39,24 @@ export const signUp = async(req, res, next) => {
     }
 }
 
-export const signIn = async(req, res) => {
+export const signIn = async(req, res, next) => {
     try {
         const { email, password } = req.body;
 
         if(!email || !password){
-            return res.status(400).json({ message: "All fields are required" });
+            throw new AppError("All fields are required", 400);
         }
 
         const user = await User.findOne({ email: email.toLowerCase()});
 
         if(!user){
-            return res.status(404).json({ message: "user not found" });
+            throw new AppError("User not found", 404);
         }
 
         const matchPassword = await bcrypt.compare(password, user.password);
 
         if(!matchPassword){
-            return res.status(400).json({ message: "Invalid credentials" });
+            throw new AppError("Invalid credentials", 400);
         }
 
         const token = generateToken(user._id, res);
@@ -72,12 +72,11 @@ export const signIn = async(req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const signOut = (req, res) => {
+export const signOut = (req, res, next) => {
     try {
         res.cookie("jwt", " ", {
             httpOnly: true,
@@ -88,9 +87,6 @@ export const signOut = (req, res) => {
             message: "user signed out successfully"
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            message: "Internal server error"
-        });
+        next(error);
     }
 }

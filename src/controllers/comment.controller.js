@@ -2,6 +2,7 @@
 import Answer from "../models/answer.model.js";
 import Comment from "../models/comment.model.js";
 import Question from "../models/question.model.js";
+import { AppError } from "../utils/AppError.js";
 
 export const questionComment = async (req, res) => {
     try {
@@ -98,7 +99,7 @@ export const getComments = async (req, res) => {
     }
 }
 
-export const updateComment = async (req, res) => {
+export const updateComment = async (req, res, next) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
@@ -106,16 +107,12 @@ export const updateComment = async (req, res) => {
         const comment = await Comment.findById(id);
 
         if(!comment){
-            return res.status(404).json({
-                message: "Comment not found"
-            });
+            throw new AppError("Comment not found", 404);
         }
 
         // Check comment owner
-        if(comment.author.toString() !== userId){
-            return res.status(403).json({
-                message: "You cannot update this comment"
-            });            
+        if(comment.author.toString() !== userId.toString()){
+            throw new AppError("You are not authorized to update this comment", 403);            
         }
         
         comment.body = req.body.body;
@@ -128,12 +125,11 @@ export const updateComment = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const deleteComment = async (req, res) => {
+export const deleteComment = async (req, res, next) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
@@ -141,12 +137,12 @@ export const deleteComment = async (req, res) => {
         const comment = await Comment.findById(id);
 
         if(!comment){
-            return res.status(404).json({ message: "Comment not found" });
+            throw new AppError("Comment not found", 404);
         }
 
         // Check comment owner
-        if(comment.author.toString() !== userId){
-            res.status(403).json({ message: "You cannot delete this comment" });
+        if(comment.author.toString() !== userId.toString()){
+            throw new AppError("You are not authorized to delete this comment", 403);
         }
 
         const deletedComment = await Comment.findByIdAndDelete(id);
@@ -157,7 +153,6 @@ export const deleteComment = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
