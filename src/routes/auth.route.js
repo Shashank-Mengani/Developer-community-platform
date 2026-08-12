@@ -2,7 +2,7 @@ import express from 'express';
 import { signIn, signOut, signUp } from '../controllers/auth.controller.js';
 import { rateLimiter } from '../middleware/rate.limiter.js';
 import { validate } from '../middleware/validate.middleware.js';
-import { signUpSchema } from '../validation/auth.validation.js';
+import { signUpSchema } from '../validators/auth.validator.js';
 
 const router = express.Router();
 

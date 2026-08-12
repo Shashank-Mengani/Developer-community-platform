@@ -1,18 +1,16 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from "../utils/jwt.token.js";
+import { AppError } from '../utils/AppError.js';
 
-
-export const signUp = async(req, res) => {
+export const signUp = async(req, res, next) => {
     try {
         const { name, email, password } = req.body;
         
         const existingUser = await User.findOne({ email: email.toLowerCase() });
 
         if(existingUser){
-            return res.status(400).json({
-                message: "User already exists"
-            });
+            throw new AppError("User already exist", 400);
         }
 
         const salt = await bcrypt.genSalt(12);
@@ -37,8 +35,7 @@ export const signUp = async(req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 

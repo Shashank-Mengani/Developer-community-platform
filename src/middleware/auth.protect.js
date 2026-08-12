@@ -1,13 +1,12 @@
 import jwt from 'jsonwebtoken';
+import { AppError } from '../utils/AppError.js';
 
 export const authenticate = (req, res, next) => {
 
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({
-          message: "No token provided"
-        });
+        throw new AppError("No token provided", 401);
     }
 
     const token = authHeader.split(" ")[1];
@@ -24,8 +23,6 @@ export const authenticate = (req, res, next) => {
         next();
 
     } catch (error) {
-        return res.status(401).json({
-            message: "Invalid or expired token"
-        });
+        next(new AppError("Invalid or expired token", 401));
     }
 }

@@ -1,7 +1,8 @@
 import Post from "../models/post.model.js";
 import User from '../models/user.model.js';
+import { AppError } from "../utils/AppError.js";
 
-export const createPost = async (req, res) => {
+export const createPost = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const { content, imageUrl } = req.body;
@@ -9,7 +10,7 @@ export const createPost = async (req, res) => {
         const user = await User.findById(userId);
 
         if(!user){
-            return res.status(404).json({ message: "user not found" });
+            throw new AppError("User not found", 404);
         }
 
         const post = await Post.create({
@@ -24,21 +25,20 @@ export const createPost = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getPostsByUser = async (req, res) => {
+export const getPostsByUser = async (req, res, next) => {
     try {
-        const userId = req.user;
+        const userId = req.user.id;
 
         const posts = await Post.find({
             author: userId
         }).populate("author", "name username");
 
-        if(!posts){
-            return res.status(404).json({ message: "Posts not found" });
+        if(posts.length === 0){
+            throw new AppError("Posts not found", 404);
         }
 
         res.status(200).json({
@@ -47,33 +47,47 @@ export const getPostsByUser = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const updatePost = async (req, res) => {
+export const getPostById = async(req, res, next) => {
     try {
-        const userId = req.user.id;
         const postId = req.params.id;
-        const { type } = req.body;
+        
+        console.log("postId: ", postId);
 
         const post = await Post.findById(postId);
 
         if(!post){
-            return res.status(404).json({ message: "Post not found" });
+            throw new AppError("Post not found", 404);
         }
 
-        post.reactions.push({
-            user: userId,
-            type
+        res.status(200).json({
+            message: "Fetched post successfully",
+            data: post
         });
 
-        await post.save();
+    } catch (error) {
+        next(error);
+    }
+} 
 
-        // if(post.author.toString() !== userId){
-        //     return res.status(403).json({ message: "Not Authorized" });
-        // }
+export const updatePost = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const postId = req.params.id;
+
+        const post = await Post.findById(postId);
+
+        if(!post){
+            throw new AppError("Post not found", 404);
+        }
+
+    
+        if(post.author.toString() !== userId){
+            throw new AppError("You are not authorized to perform this action", 403);
+        }
 
         const postUpdate = await Post.findByIdAndUpdate(postId, req.body, {
             new: true,
@@ -82,11 +96,43 @@ export const updatePost = async (req, res) => {
 
         res.status(200).json({
             message: "Post updated successfully",
-            data: post
+            data: postUpdate
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
+    }
+}
+
+export const reactToPost = async(req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { postId } = req.params.id;
+        const { type } = req.body;
+
+        const post = await Post.findById(postId);
+
+        if(!post){
+            throw new AppError("Post not found", 404);
+        }
+
+        const existingReaction = post.reactions.find(reaction => reaction.user.toString() === userId.toString());
+
+        if(existingReaction){
+            existingReaction.type = type;
+        } else{
+            post.reactions.push({
+                user: userId,
+                type
+            });
+        }
+        await post.save();
+
+        return res.status(200).json({
+            message: "Reaction added successfully",
+            data: post
+        });
+    } catch (error) {
+        next(error);
     }
 }

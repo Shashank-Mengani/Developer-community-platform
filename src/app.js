@@ -11,6 +11,7 @@ import postRoutes from './routes/post.route.js';
 import googleRoutes from './routes/google.auth.route.js';
 import passport from './config/passport.js';
 import notificationRoutes from './routes/notification.route.js';
+import { errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
 
@@ -29,5 +30,7 @@ app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);
 app.use('/auth', googleRoutes);
 app.use('/posts', notificationRoutes);
+
+app.use(errorHandler);
 
 export default app;

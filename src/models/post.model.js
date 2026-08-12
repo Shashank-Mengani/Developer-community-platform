@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { required } from 'zod/mini';
 
 const postSchema = new mongoose.Schema({
 
@@ -10,6 +11,7 @@ const postSchema = new mongoose.Schema({
 
     content: {
         type: String,
+        required: true,
         trim: true,
         maxlength: 1000
     },
