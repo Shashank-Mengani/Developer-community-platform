@@ -1,7 +1,8 @@
 import Answer from '../models/answer.model.js';
 import Question from '../models/question.model.js';
+import { AppError } from '../utils/AppError.js';
 
-export const createAnswer = async (req, res) => {
+export const createAnswer = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { body } = req.body;
@@ -13,7 +14,7 @@ export const createAnswer = async (req, res) => {
         console.log("question: ", question);
 
         if(!question){
-            return res.status(404).json({ message: "Question not found" });
+           throw new AppError("Question not found", 404);
         }
 
         const answer = await Answer.create({
@@ -28,12 +29,11 @@ export const createAnswer = async (req, res) => {
 
         res.status(201).json({ message: "Answer created successfully" });
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getAnswer = async (req, res) => {
+export const getAnswer = async (req, res, next) => {
     try {
         const answer = await Answer.find();
 
@@ -43,12 +43,11 @@ export const getAnswer = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getAnswerById = async (req, res) => {
+export const getAnswerById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const answer = await Answer.findById(id);
@@ -59,8 +58,7 @@ export const getAnswerById = async (req, res) => {
         });
         
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
@@ -79,7 +77,6 @@ export const updateAnswer = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }

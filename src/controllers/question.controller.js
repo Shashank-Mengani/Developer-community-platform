@@ -1,6 +1,7 @@
 import Question from '../models/question.model.js';
+import { AppError } from '../utils/AppError.js';
 
-export const createQuestions = async (req, res) => {
+export const createQuestions = async (req, res, next) => {
     try {
         const { title, body, views } = req.body;
 
@@ -9,7 +10,7 @@ export const createQuestions = async (req, res) => {
         });
 
         if(existingQuestion){
-            return res.status(401).json({ message: "Bad Request "});
+            throw new AppError("Bad Request", 401);
         }
 
         const question = await Question.insertMany(req.body);
@@ -20,12 +21,11 @@ export const createQuestions = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getQuestion = async (req, res) => {
+export const getQuestion = async (req, res, next) => {
     try {
         const questions = await Question.find();
 
@@ -35,12 +35,11 @@ export const getQuestion = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getQuestionById = async (req, res) => {
+export const getQuestionById = async (req, res, next) => {
     try {
         const { id } = req.params.id;
 
@@ -51,12 +50,11 @@ export const getQuestionById = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const updateQuestion = async (req, res) => {
+export const updateQuestion = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -67,22 +65,20 @@ export const updateQuestion = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" })
+        next(error);
     }
 }
 
-export const deleteQuestion = async (req, res) => {
+export const deleteQuestion = async (req, res, next) => {
     try {
         const { id } = req.params;
 
         const question = await Question.findByIdAndDelete(id);
         if(!question){
-            return res.status(404).json({ message: "Question not found" });
+            throw new AppError("Question not found", 404);
         }
         res.status(200).json({ message: "Question deleted successfully" });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
