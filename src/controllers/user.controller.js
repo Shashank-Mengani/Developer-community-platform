@@ -1,8 +1,9 @@
 import { use } from "react";
 import User from "../models/user.model.js";
 import cloudinary from "../config/cloudinary.js";
+import { AppError } from "../utils/AppError.js";
 
-export const getPost = async(req, res) => {
+export const getPost = async(req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -10,9 +11,7 @@ export const getPost = async(req, res) => {
             .select("-password");
 
         if (!user) {
-            return res.status(404).json({
-                message: "User not found"
-            });
+            throw new AppError("User not found", 404);
         }
 
         res.status(200).json({
@@ -20,12 +19,11 @@ export const getPost = async(req, res) => {
             data: user
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error "});
+        next(error);
     }
 }
 
-export const updateProfile = async(req, res) => {
+export const updateProfile = async(req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -37,21 +35,18 @@ export const updateProfile = async(req, res) => {
         });        
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const uploadProfileImage = async (req, res) => {
+export const uploadProfileImage = async (req, res, next) => {
   try {
 
     console.log("USER:", req.user);
     console.log("FILE:", req.file);
 
     if (!req.file) {
-      return res.status(400).json({
-        message: "No image uploaded"
-      });
+        throw new AppError("No image uploaded", 400);
     }
 
     const result = await cloudinary.uploader.upload(req.file.path, {
@@ -74,14 +69,11 @@ export const uploadProfileImage = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("ERROR:", error);
-    res.status(500).json({
-      message: error.message
-    });
+        next(error);
   }
 };
 
-export const followUser = async (req, res) => {
+export const followUser = async (req, res, next) => {
     try {
         const currUserId = req.user.id;
         const targetUserId = req.params.id;
@@ -90,14 +82,14 @@ export const followUser = async (req, res) => {
         console.log(targetUserId);
 
         if(currUserId === targetUserId){
-            return res.status(400).json({ message: "You cannot follow yourself" });
+            throw new AppError("You cannot follow yourself", 400);
         }
 
         const currUser = await User.findById(currUserId);
         const userToFollow = await User.findById(targetUserId);
 
         if(!userToFollow){
-            return res.status(404).json({ message: "User not found" });
+            throw new AppError("User not found", 404);
         }
 
         if (
@@ -105,9 +97,7 @@ export const followUser = async (req, res) => {
                 id => id.toString() === targetUserId
             )
         ) {
-            return res.status(400).json({
-                message: "You are already following this user"
-            });
+            throw new AppError("You are already following this user", 400);
         }
 
         currUser.following.push(targetUserId);
@@ -120,12 +110,11 @@ export const followUser = async (req, res) => {
             message:"User followed successfully"
         });        
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const unFollowUser = async (req, res) => {
+export const unFollowUser = async (req, res, next) => {
     try {
         const currUserId = req.user.id;
         const targetUserId = req.params.id;
@@ -134,11 +123,11 @@ export const unFollowUser = async (req, res) => {
         const userToUnfollow = await User.findById(targetUserId);
 
         if (!currUser) {
-            return res.status(404).json({ message: "Current user not found" });
+            throw new AppError("Current user not found", 404);
         }
 
         if(!userToUnfollow){
-            return res.status(404).json({ message: "User not found"});
+            throw new AppError("User not found", 404);
         }
 
         currUser.following = currUser.following.filter(id => id.toString() !== targetUserId);
@@ -151,7 +140,6 @@ export const unFollowUser = async (req, res) => {
         res.status(200).json({ message: "Unfollowed user successfully" });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }

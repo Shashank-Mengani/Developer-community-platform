@@ -4,7 +4,7 @@ import Comment from "../models/comment.model.js";
 import Question from "../models/question.model.js";
 import { AppError } from "../utils/AppError.js";
 
-export const questionComment = async (req, res) => {
+export const questionComment = async (req, res, next) => {
     try {
         const questionId = req.params.id;
         const author = req.user.id;
@@ -13,7 +13,7 @@ export const questionComment = async (req, res) => {
         const question = await Question.findById(questionId);
 
         if(!question){
-            return res.status(404).json({ message: "Question not found" });
+            throw new AppError("Question not found", 404);
         }
 
         const comment = await Comment.create({
@@ -28,12 +28,11 @@ export const questionComment = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const commentQuestion = async (req, res) => {
+export const commentQuestion = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -47,12 +46,11 @@ export const commentQuestion = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const answerComment = async (req, res) => {
+export const answerComment = async (req, res, next) => {
     try {
         const answerId = req.params.id;
         const author = req.user.id;
@@ -61,7 +59,7 @@ export const answerComment = async (req, res) => {
         const answer = await Answer.findById(answerId);
 
         if(!answer){
-            return res.status(404).json({ message: "Answer not found" });
+            throw new AppError("Answer not found", 404);
         }
 
         const comment = await Comment.create({
@@ -76,12 +74,11 @@ export const answerComment = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-export const getComments = async (req, res) => {
+export const getComments = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -94,8 +91,7 @@ export const getComments = async (req, res) => {
             data: comments
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 

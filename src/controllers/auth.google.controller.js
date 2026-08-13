@@ -1,7 +1,8 @@
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/jwt.token.js";
+import { AppError } from "../utils/AppError.js";
 
-export const googleLogin = async (req, res) => {
+export const googleLogin = async (req, res, next) => {
     try {
         const { googleId, name, email } = req.user;
 
@@ -50,9 +51,6 @@ export const googleLogin = async (req, res) => {
 
 
     } catch (error) {
-        console.log("Google login error:", error);
-        return res.status(500).json({
-            message: "Internal server error"
-        });
+        next(error);
     }
 };
