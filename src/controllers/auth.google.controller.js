@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-import { generateToken } from "../utils/jwt.token.js";
+import { generateAccessToken, generaterefreshToken } from "../utils/jwt.token.js";
 import { AppError } from "../utils/AppError.js";
 
 export const googleLogin = async (req, res, next) => {
@@ -36,7 +36,8 @@ export const googleLogin = async (req, res, next) => {
             }
         }
 
-        const token = generateToken(user._id, res);
+        const accessToken = generateAccessToken(user._id, res);
+        const refreshToken = generaterefreshToken(user._id, res);
 
         return res.status(200).json({
             message: "Google login successful",
@@ -46,7 +47,8 @@ export const googleLogin = async (req, res, next) => {
                 email: user.email,
                 googleId: user.googleId
             },
-            token
+            accessToken,
+            refreshToken
         });
 
 

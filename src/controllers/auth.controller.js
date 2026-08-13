@@ -1,6 +1,6 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
-import { generateToken } from "../utils/jwt.token.js";
+import { generateAccessToken, generaterefreshToken } from "../utils/jwt.token.js";
 import { AppError } from '../utils/AppError.js';
 
 export const signUp = async(req, res, next) => {
@@ -22,7 +22,8 @@ export const signUp = async(req, res, next) => {
             password: hashPassword
         });
 
-        const token = generateToken(createUser._id, res);
+        const accessToken = generateAccessToken(createUser._id, res);
+        const refreshToken = generaterefreshToken(createUser._id, res);
         
         res.status(201).json({
             message: "user signUp successfully",
@@ -31,7 +32,8 @@ export const signUp = async(req, res, next) => {
                 name: createUser.name,
                 email: createUser.email
             },
-            token
+            accessToken,
+            refreshToken
         });
 
     } catch (error) {
@@ -59,7 +61,8 @@ export const signIn = async(req, res, next) => {
             throw new AppError("Invalid credentials", 400);
         }
 
-        const token = generateToken(user._id, res);
+        const accessToken = generateAccessToken(user._id, res);
+        const refreshToken = generaterefreshToken(user._id, res);
 
         res.status(200).json({
             message: "user signIn",
@@ -68,7 +71,8 @@ export const signIn = async(req, res, next) => {
                 email: user.email.toLowerCase(),
                 name: user.name
             },
-            token
+            accessToken,
+            refreshToken
         });
 
     } catch (error) {
