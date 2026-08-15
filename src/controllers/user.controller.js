@@ -1,4 +1,4 @@
-import { use } from "react";
+
 import User from "../models/user.model.js";
 import cloudinary from "../config/cloudinary.js";
 import { AppError } from "../utils/AppError.js";
@@ -47,15 +47,35 @@ export const uploadProfileImage = async (req, res, next) => {
             throw new AppError("Please upload an image", 400);
         }
 
+        const userId = req.user.id;
+
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: "devpost/avatars-image"
         });
 
-        console.log("CLOUDINARY URL:", result.secure_url);
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {
+                avatar: result.secure_url
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+    
+        if (!user) {
+            throw new AppError("User not found", 404);
+        }
+
         res.status(200).json({
             success: true,
             message: "Profile image uploaded successfully",
-            avatar: result.secure_url,
+            data: {
+                id: user._id,
+                name: user.name,
+                avatar: user.avatar
+            }
             });
 
     } catch (error) {

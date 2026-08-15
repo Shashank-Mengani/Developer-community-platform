@@ -24,7 +24,7 @@ export const signUp = async(req, res, next) => {
         });
 
         const accessToken = generateAccessToken(createUser._id, res);
-        const refreshToken = generaterefreshToken(createUser._id, res);
+        generaterefreshToken(createUser._id, res);
         
         res.status(201).json({
             message: "user signUp successfully",
@@ -33,8 +33,7 @@ export const signUp = async(req, res, next) => {
                 name: createUser.name,
                 email: createUser.email
             },
-            accessToken,
-            refreshToken
+            accessToken
         });
 
     } catch (error) {
@@ -54,15 +53,9 @@ export const signIn = async(req, res, next) => {
 
         const user = await User.findOne({ email: normalizedEmail });
 
-        console.log("Sign-In", user);
-
         if(!user){
             throw new AppError("User not found", 404);
         }
-
-        console.log("Email:", email);
-        console.log("Password received:", password);
-        console.log("Password hash:", user.password);
 
         const matchPassword = await bcrypt.compare(password, user.password);
 
@@ -71,7 +64,7 @@ export const signIn = async(req, res, next) => {
         }
 
         const accessToken = generateAccessToken(user._id, res);
-        const refreshToken = generaterefreshToken(user._id, res);
+        generaterefreshToken(user._id, res);
 
         res.status(200).json({
             message: "user signIn in successfully",
@@ -80,8 +73,7 @@ export const signIn = async(req, res, next) => {
                 email: user.email,
                 name: user.name
             },
-            accessToken,
-            refreshToken
+            accessToken
         });
 
     } catch (error) {
@@ -91,14 +83,19 @@ export const signIn = async(req, res, next) => {
 
 export const signOut = (req, res, next) => {
     try {
-        res.cookie("jwt", " ", {
+        const cookieOptions = {
             httpOnly: true,
-            expires: new Date(0)
-        });
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        };
+
+        res.clearCookie("accessToken", cookieOptions);
+        res.clearCookie("refreshToken", cookieOptions);
 
         res.status(200).json({
             message: "user signed out successfully"
         });
+
     } catch (error) {
         next(error);
     }

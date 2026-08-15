@@ -9,7 +9,7 @@ router.get('/:id', getPost);
 
 router.put('/profile/:id', authenticate, updateProfile);
 
-router.put('/profile-image', authenticate, upload.single("profileImage"), uploadProfileImage);
+router.put('/profile-image', authenticate, upload.single("avatar"), uploadProfileImage);
 
 router.post('/follow/:id', authenticate, followUser);
 
