@@ -50,11 +50,19 @@ export const signIn = async(req, res, next) => {
             throw new AppError("All fields are required", 400);
         }
 
-        const user = await User.findOne({ email: email.toLowerCase()});
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const user = await User.findOne({ email: normalizedEmail });
+
+        console.log("Sign-In", user);
 
         if(!user){
             throw new AppError("User not found", 404);
         }
+
+        console.log("Email:", email);
+        console.log("Password received:", password);
+        console.log("Password hash:", user.password);
 
         const matchPassword = await bcrypt.compare(password, user.password);
 
@@ -66,10 +74,10 @@ export const signIn = async(req, res, next) => {
         const refreshToken = generaterefreshToken(user._id, res);
 
         res.status(200).json({
-            message: "user signIn",
+            message: "user signIn in successfully",
             data: {
                 id: user._id,
-                email: user.email.toLowerCase(),
+                email: user.email,
                 name: user.name
             },
             accessToken,

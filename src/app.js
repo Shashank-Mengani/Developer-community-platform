@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 app.use(passport.initialize());
 
-app.use('/api', authRoute);
+app.use('/auth', authRoute);
 app.use('/user', userRoute);
 app.use('/question', questionRoute);
 app.use('/answer', answerRoute);

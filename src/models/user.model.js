@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt';
+
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -116,10 +117,10 @@ UserSchema.virtual('followingCount').get(function() {
 });
 
 //Pre-save hook
-UserSchema.pre('save', async function () {
-    if(!this.isModified('password') || !this.password) return;
-    this.password = await bcrypt.hash(this.password, 12);
-});
+// UserSchema.pre('save', async function () {
+//     if(!this.isModified('password') || !this.password) return;
+//     this.password = await bcrypt.hash(this.password, 12);
+// });
 
 //Instance method: compare password
 UserSchema.methods.comparePassword = async function(candidate){
@@ -128,7 +129,6 @@ UserSchema.methods.comparePassword = async function(candidate){
     }
     return bcrypt.compare(candidate, this.password)
 }
-
 
 const User = mongoose.model("User", UserSchema);
 
