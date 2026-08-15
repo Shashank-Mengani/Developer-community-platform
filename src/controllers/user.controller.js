@@ -40,38 +40,28 @@ export const updateProfile = async(req, res, next) => {
 }
 
 export const uploadProfileImage = async (req, res, next) => {
-  try {
+    try {
+        console.log("File: ", req.file);
 
-    console.log("USER:", req.user);
-    console.log("FILE:", req.file);
+        if(!req.file){
+            throw new AppError("Please upload an image", 400);
+        }
 
-    if (!req.file) {
-        throw new AppError("No image uploaded", 400);
-    }
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: "devpost/avatars-image"
+        });
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "devpost/avatars-images"
-    });
+        console.log("CLOUDINARY URL:", result.secure_url);
+        res.status(200).json({
+            success: true,
+            message: "Profile image uploaded successfully",
+            avatar: result.secure_url,
+            });
 
-    console.log("CLOUDINARY:", result);
-
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        profileImage: result.secure_url
-      },
-      { new: true }
-    );
-
-    res.status(200).json({
-      message: "Avatar image uploaded successfully",
-      profileImage: user.profileImage
-    });
-
-  } catch (error) {
+    } catch (error) {
         next(error);
-  }
-};
+    }
+}
 
 export const followUser = async (req, res, next) => {
     try {

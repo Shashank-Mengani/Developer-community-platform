@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { generateAccessToken, generaterefreshToken } from "../utils/jwt.token.js";
 import { AppError } from '../utils/AppError.js';
 
@@ -90,6 +91,37 @@ export const signOut = (req, res, next) => {
         res.status(200).json({
             message: "user signed out successfully"
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const refreshAccessToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        
+        if(!refreshToken){
+            throw new AppError("Refresh token not provided", 401);
+        }
+
+        const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET
+        );
+
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            throw new AppError("User not found", 404);
+        }
+        
+        const accessToken = generateAccessToken(user._id, res);
+        
+        res.status(200).json({
+            message: "Access token refreshed",
+            data: accessToken
+        });
+
     } catch (error) {
         next(error);
     }
