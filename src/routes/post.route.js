@@ -4,6 +4,7 @@ import { authenticate } from '../middleware/auth.protect.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { createPostSchema } from '../validators/post.validator.js';
 import { reactionSchema } from '../validators/reaction.validator.js';
+import { profileUpdateLimiter } from '../middleware/rate.limiter.js';
 
 const postRoute = express.Router();
 
@@ -15,7 +16,7 @@ postRoute.get('/user/:id', authenticate, getPostsByUser);
 
 postRoute.get('/:id/post', authenticate, getPostById);
 
-postRoute.put('/:id', authenticate, updatePost);
+postRoute.put('/:id', authenticate, profileUpdateLimiter, updatePost);
 
 postRoute.delete('/:id/post', authenticate, deletePost);
 

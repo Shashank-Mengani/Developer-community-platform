@@ -7,3 +7,16 @@ export const rateLimiter = rateLimit({
         message: "Too many requests, Please try again later"
     }
 });
+
+export const profileUpdateLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 1,
+
+    keyGenerator: (req) => req.user.id,
+    
+    message: {
+        message: "You can update your profile again after 10 minutes."
+    },
+    standardHeaders: "draft-7",
+    legacyHeaders: false
+});
