@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { generateAccessToken, generaterefreshToken } from "../utils/jwt.token.js";
 import { AppError } from '../utils/AppError.js';
+import { sendWelcomeEmail } from '../emails/emailHandler.js';
 
 export const signUp = async(req, res, next) => {
     try {
@@ -35,6 +36,12 @@ export const signUp = async(req, res, next) => {
             },
             accessToken
         });
+
+        try {
+            await sendWelcomeEmail(createUser.email, createUser.name, process.env.CLIENT_URL);
+        } catch (error) {
+            console.log(error.message);
+        }
 
     } catch (error) {
         next(error);
