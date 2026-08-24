@@ -1,9 +1,11 @@
+import { generateQuestionTags } from '../ai-services/questionTags.service.js';
 import Question from '../models/question.model.js';
 import { AppError } from '../utils/AppError.js';
 
 export const createQuestions = async (req, res, next) => {
     try {
-        const { title, body, views } = req.body;
+        const userId = req.user.id;
+        const { title, body } = req.body;
 
         const existingQuestion = await Question.findOne({
             title: title
@@ -13,7 +15,19 @@ export const createQuestions = async (req, res, next) => {
             throw new AppError("Bad Request", 401);
         }
 
-        const question = await Question.insertMany(req.body);
+        const aiResult = await generateQuestionTags(title, body);
+
+        let tags = [];
+        if(Array.isArray(aiResult.tags)){
+            tags = aiResult.tags;
+        }
+
+        const question = await Question.create({
+            author: userId,
+            title,
+            body,
+            tags
+        });
 
         res.status(201).json({
             message: "question added successfully",

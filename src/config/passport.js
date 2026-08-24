@@ -12,7 +12,7 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
 
-    async (accessToken, refreshToken, profile, done) => {
+    async (profile, done) => {
       try {
         return done(null, {
           googleId: profile.id,

@@ -24,6 +24,8 @@ export const signUp = async(req, res, next) => {
             password: hashPassword
         });
 
+        console.log("You’ve signed up using your: ", { name, email });
+
         const accessToken = generateAccessToken(createUser._id, res);
         generaterefreshToken(createUser._id, res);
         
@@ -37,11 +39,11 @@ export const signUp = async(req, res, next) => {
             accessToken
         });
 
-        try {
-            await sendWelcomeEmail(createUser.email, createUser.name, process.env.CLIENT_URL);
-        } catch (error) {
-            console.log(error.message);
-        }
+        // try {
+        //     await sendWelcomeEmail(createUser.email, createUser.name, process.env.CLIENT_URL);
+        // } catch (error) {
+        //     console.log(error.message);
+        // }
 
     } catch (error) {
         next(error);
@@ -69,6 +71,8 @@ export const signIn = async(req, res, next) => {
         if(!matchPassword){
             throw new AppError("Invalid credentials", 400);
         }
+
+        console.log("You’ve successfully logged in using your Gmail account: ", email);
 
         const accessToken = generateAccessToken(user._id, res);
         generaterefreshToken(user._id, res);
@@ -132,6 +136,26 @@ export const refreshAccessToken = async (req, res, next) => {
         res.status(200).json({
             message: "Access token refreshed",
             data: accessToken
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getCurrentUser = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await User.findById(userId).select("-password");
+
+        if(!user){
+            throw new AppError("User was not found", 404);
+        }
+
+        res.status(200).json({
+            message: "Current user fetched successfully",
+            data: user
         });
 
     } catch (error) {

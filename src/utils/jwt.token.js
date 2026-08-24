@@ -10,7 +10,7 @@ export const generateAccessToken = (userId, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 15
+        maxAge: 1000 * 60 * 30
     });
     return accesstoken;
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, deletePost, getPostById, getPostsByUser, reactToPost, updatePost } from '../controllers/post.controller.js';
+import { createPost, deletePost, getAllPosts, getPostById, getPostsByUser, reactToPost, updatePost } from '../controllers/post.controller.js';
 import { authenticate } from '../middleware/auth.protect.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { createPostSchema } from '../validators/post.validator.js';
@@ -15,6 +15,8 @@ postRoute.post('/:id/reaction', validate(reactionSchema), authenticate, reactToP
 postRoute.get('/user/:id', authenticate, getPostsByUser);
 
 postRoute.get('/:id/post', authenticate, getPostById);
+
+postRoute.get('/', authenticate, getAllPosts);
 
 postRoute.put('/:id', authenticate, profileUpdateLimiter, updatePost);
 

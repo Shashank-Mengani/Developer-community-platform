@@ -5,7 +5,7 @@ import { AppError } from "../utils/AppError.js";
 export const createPost = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const { content, imageUrl } = req.body;
+        const { content, imageUrl, visibility } = req.body;
 
         const user = await User.findById(userId);
 
@@ -16,7 +16,8 @@ export const createPost = async (req, res, next) => {
         const post = await Post.create({
             author: userId,
             content,
-            imageUrl
+            imageUrl,
+            visibility
         });
 
         res.status(201).json({ 
@@ -43,6 +44,22 @@ export const getPostsByUser = async (req, res, next) => {
 
         res.status(200).json({
             message: "User posts fetched successfully",
+            data: posts
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getAllPosts = async (req, res, next) => {
+    try {
+        const posts = await Post.find()
+                .populate("author", "name username")
+                .sort({ createdAt: -1 });
+               
+        return res.status(200).json({
+            message: "Posts fetched successfully",
             data: posts
         });
 
@@ -107,7 +124,7 @@ export const updatePost = async (req, res, next) => {
 export const reactToPost = async(req, res, next) => {
     try {
         const userId = req.user.id;
-        const { postId } = req.params.id;
+        const postId = req.params.id;
         const { type } = req.body;
 
         const post = await Post.findById(postId);
@@ -128,10 +145,15 @@ export const reactToPost = async(req, res, next) => {
         }
         await post.save();
 
+        await post.populate("author", "name username");
+
+        console.log(`post was ${type} by someone`);
+
         return res.status(200).json({
             message: "Reaction added successfully",
             data: post
         });
+        
     } catch (error) {
         next(error);
     }

@@ -1,13 +1,15 @@
+
+import { answerTags } from '../ai-services/answerTags.service.js';
 import Answer from '../models/answer.model.js';
 import Question from '../models/question.model.js';
 import { AppError } from '../utils/AppError.js';
 
 export const createAnswer = async (req, res, next) => {
     try {
+
+        const userId = req.user.id;
         const { id } = req.params;
         const { body } = req.body;
-
-        console.log("DB:", Question.db.name);
 
         const question = await Question.findById(id);
 
@@ -17,17 +19,31 @@ export const createAnswer = async (req, res, next) => {
            throw new AppError("Question not found", 404);
         }
 
+        const aiResult = await answerTags(body);
+
+        let tags = [];
+        if(Array.isArray(aiResult.tags)){
+            tags = aiResult.tags;
+        }
+
         const answer = await Answer.create({
+            author: userId,
             body: body,
-            question: id
+            question: id,
+            tags
         });
 
         const updateQuestion = await Question.findByIdAndUpdate(id, {
             $inc: { answerCount: 1 }
         }, { new: true });
-        console.log(updateQuestion);
+        
+        // console.log(updateQuestion);
 
-        res.status(201).json({ message: "Answer created successfully" });
+        res.status(201).json({ 
+            message: "Answer created successfully",
+            data: answer
+         });
+
     } catch (error) {
         next(error);
     }

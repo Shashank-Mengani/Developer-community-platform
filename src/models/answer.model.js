@@ -23,13 +23,10 @@ const answerSchema = new mongoose.Schema({
         default: 0
     },
 
-    tags: [
-        {
-        type: String,
-        trim: true,
-        lowercase: true
-        }
-    ],
+    tags: {
+        type: [String],
+        default: []
+    },
 
     isAccepted: {
         type: Boolean,

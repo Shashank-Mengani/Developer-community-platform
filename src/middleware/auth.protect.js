@@ -3,13 +3,11 @@ import { AppError } from '../utils/AppError.js';
 
 export const authenticate = (req, res, next) => {
 
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if(!token){
         throw new AppError("No token provided", 401);
     }
-
-    const token = authHeader.split(" ")[1];
 
     try {
         

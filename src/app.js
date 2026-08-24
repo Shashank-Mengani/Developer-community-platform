@@ -12,12 +12,21 @@ import googleRoutes from './routes/google.auth.route.js';
 import passport from './config/passport.js';
 import notificationRoutes from './routes/notification.route.js';
 import { errorHandler } from './middleware/error.middleware.js';
+import aiRoutes from './routes/ai.route.js'
+import cors from 'cors';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true
+    })
+);
 
 app.use(passport.initialize());
 
@@ -31,6 +40,7 @@ app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);
 app.use('/auth', googleRoutes);
 app.use('/posts', notificationRoutes);
+app.use('/ai', aiRoutes);
 
 app.use(errorHandler);
 
