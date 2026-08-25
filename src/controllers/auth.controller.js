@@ -103,6 +103,8 @@ export const signOut = (req, res, next) => {
         res.clearCookie("accessToken", cookieOptions);
         res.clearCookie("refreshToken", cookieOptions);
 
+        console.log("User was signed out");
+
         res.status(200).json({
             message: "user signed out successfully"
         });

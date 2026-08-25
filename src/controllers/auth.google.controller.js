@@ -51,7 +51,6 @@ export const googleLogin = async (req, res, next) => {
             refreshToken
         });
 
-
     } catch (error) {
         next(error);
     }

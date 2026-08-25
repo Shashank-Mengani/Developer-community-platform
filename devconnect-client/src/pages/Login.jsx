@@ -21,7 +21,7 @@ const Login = () => {
       const response = await api.post("/auth/signin", formData);
       setMessage(response.data.message);
 
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       setMessage(
         error.response?.data?.message || "Signin failed"
@@ -100,7 +100,7 @@ const Login = () => {
             type="submit"
             className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 active:scale-[0.99]"
           >
-            Login
+            Signin
           </button>
 
         </form>

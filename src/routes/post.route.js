@@ -5,10 +5,11 @@ import { validate } from '../middleware/validate.middleware.js';
 import { createPostSchema } from '../validators/post.validator.js';
 import { reactionSchema } from '../validators/reaction.validator.js';
 import { profileUpdateLimiter } from '../middleware/rate.limiter.js';
+import upload from '../middleware/upload.middleware.js';
 
 const postRoute = express.Router();
 
-postRoute.post('/user/post', validate(createPostSchema), authenticate, createPost);
+postRoute.post('/user/post', authenticate, upload.single("image"), validate(createPostSchema), createPost);
 
 postRoute.post('/:id/reaction', validate(reactionSchema), authenticate, reactToPost);
 

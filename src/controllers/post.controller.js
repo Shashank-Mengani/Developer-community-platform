@@ -1,16 +1,34 @@
 import Post from "../models/post.model.js";
 import User from '../models/user.model.js';
 import { AppError } from "../utils/AppError.js";
+import cloudinary from "../config/cloudinary.js"
 
 export const createPost = async (req, res, next) => {
     try {
+
+        console.log("REQ FILE:", req.file);
+        console.log("REQ BODY:", req.body);
+        
         const userId = req.user.id;
-        const { content, imageUrl, visibility } = req.body;
+        const { content, visibility } = req.body;
 
         const user = await User.findById(userId);
 
         if(!user){
             throw new AppError("User not found", 404);
+        }
+
+        let imageUrl = "";
+
+        if(req.file){
+            const result = await cloudinary.uploader.upload(
+                req.file.path,
+                {
+                    folder: "devpost/posts-image"
+                }
+            );
+            
+            imageUrl = result.secure_url;
         }
 
         const post = await Post.create({
