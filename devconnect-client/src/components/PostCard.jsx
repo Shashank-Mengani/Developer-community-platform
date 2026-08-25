@@ -1,9 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
 
 const PostCard = ({ post }) => {
 
     const [currentPost, setCurrentPost] = useState(post);
+    const [comment, setComment] = useState("");
+    const [comments, setComments] = useState([]);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const response = await api.get(
+                    `/comments/postComments/${post._id}`
+                );
+
+                console.log("COMMENTS RESPONSE:", response.data);
+
+                setComments(response.data.data || []);
+
+            } catch (error) {
+                console.log(
+                    error.response?.data?.message ||
+                    "Failed to fetch comments"
+                );
+            }
+        };
+
+        fetchComments();
+    }, [post._id]);
+
 
     const handleReaction = async (type) => {
 
@@ -22,6 +47,52 @@ const PostCard = ({ post }) => {
             );
         }
     };
+
+    const handleComment = async () => {
+        try {
+            const response = await api.post(
+                `/comments/post/${post._id}`,
+                {
+                    body: comment
+                }
+            );
+
+            setComments((previousComments) => [
+                ...previousComments,
+                response.data.data
+            ]);
+
+            setComment("");
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to add comment"
+            );
+        }
+    }
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const response = await api.delete(
+                `/comments/posts/${post._id}/comments/${commentId}`
+            );
+            console.log("delete response:", response.data);
+
+            // Remove deleted comment from UI
+            setComments((previousComments) =>
+                previousComments.filter(
+                    (comment) => comment._id !== commentId
+                )
+            );
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to delete comment"
+        ); 
+        }
+    }
 
     const getReactionCount = (type) => {
         return currentPost.reactions?.filter(
@@ -46,6 +117,53 @@ const PostCard = ({ post }) => {
                     alt="post"
                 />    
             )}
+
+            <input 
+                type="text"
+                placeholder="Write a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+            />    
+
+            <button onClick={handleComment}>Comment</button>
+
+ <div>
+                {comments.map((comment) => (
+                    <div key={comment._id}>
+                        <strong>
+                            {comment.author?.name}
+                        </strong>
+
+                        <p>
+                            {comment.body}
+                        </p>
+
+                        <small>
+                            {comment.createdAt &&
+                                new Date(
+                                    comment.createdAt
+                                ).toLocaleString()}
+                        </small>
+
+                        <button
+                            onClick={() =>
+                                handleDeleteComment(comment._id)
+                            }
+                        >
+                            Delete
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            <div>
+                {comments.map((comment) => (
+                    <div key={comment._id}>
+                        <strong>{comment.author?.name}</strong>
+                        <p>{comment.body}</p>
+                    </div>
+                ))}
+            </div>
 
             <small>
                 {new Date(currentPost.createdAt).toLocaleString()}
