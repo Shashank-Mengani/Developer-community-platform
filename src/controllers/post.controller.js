@@ -6,8 +6,8 @@ import cloudinary from "../config/cloudinary.js"
 export const createPost = async (req, res, next) => {
     try {
 
-        console.log("REQ FILE:", req.file);
-        console.log("REQ BODY:", req.body);
+        // console.log("REQ FILE:", req.file);
+        // console.log("REQ BODY:", req.body);
         
         const userId = req.user.id;
         const { content, visibility } = req.body;
@@ -37,6 +37,8 @@ export const createPost = async (req, res, next) => {
             imageUrl,
             visibility
         });
+
+        await post.populate("author", "name username");
 
         res.status(201).json({ 
             message: "Post created successfully",
