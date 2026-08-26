@@ -7,6 +7,7 @@ const PostCard = ({ post }) => {
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [bookmark, setBookmark] = useState(null);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -148,6 +149,23 @@ const PostCard = ({ post }) => {
         }
     }
 
+    const handleShare = async () => {
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+
+        try {
+            await navigator.clipboard.writeText(postUrl);
+            
+            setCopied(true);
+
+            setTimeout(() => {
+                setCopied(false);
+            }, 2000);
+
+        } catch (error) {
+            console.log("Failed to copy post link", error);
+        }
+    }
+
     const getReactionCount = (type) => {
         return currentPost.reactions?.filter(
             reaction => reaction.type === type
@@ -199,8 +217,6 @@ const PostCard = ({ post }) => {
             <div className="flex flex-wrap gap-3 border-b border-gray-200 pb-4 mb-4 text-sm text-gray-600">
 
                 <span>❤️ {getReactionCount("like")}</span>
-                <span>💕 {getReactionCount("love")}</span>
-                <span>😮 {getReactionCount("wow")}</span>
 
             </div>
 
@@ -215,19 +231,13 @@ const PostCard = ({ post }) => {
                 </button>
 
                 <button
-                    onClick={() => handleReaction("love")}
+                    onClick={handleShare}
                     className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
                 >
-                    💕 Love
+                    {copied ? "✅ Link copied!" : "🔗 Share"}
                 </button>
 
-                <button
-                    onClick={() => handleReaction("wow")}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
-                >
-                    😮 Wow
-                </button>
-
+                {/* Bookmark */}
                 {bookmark ? (
                     <button
                         onClick={handleRemoveBookmark}
