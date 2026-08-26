@@ -16,11 +16,13 @@ const bookmarkSchema = new mongoose.Schema({
 
     item: {
         type: mongoose.Schema.Types.ObjectId,
+        refPath: "itemType",
         required: true
-    }
+    },
 
 }, { timestamps: true });
 
+bookmarkSchema.index({ user: 1, itemType: 1, item: 1 }, { unique: true });
 const Bookmark = mongoose.model("Bookmark", bookmarkSchema);
 
 export default Bookmark;

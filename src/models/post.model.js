@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { required } from 'zod/mini';
 
 const postSchema = new mongoose.Schema({
 
@@ -35,7 +34,7 @@ const postSchema = new mongoose.Schema({
             },
             type: {
                 type: String,
-                enum: ["like", "love", "haha", "wow", "sad", "angry"],
+                enum: ["like", "love", "wow"],
                 default: "like"
             },
             reactedAt: {
@@ -44,6 +43,11 @@ const postSchema = new mongoose.Schema({
             }
         }
     ],
+
+    shareCount: {
+        type: Number,
+        default: 0
+    }
 
 }, { timestamps: true });
 

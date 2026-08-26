@@ -123,6 +123,7 @@ UserSchema.virtual('followingCount').get(function() {
 // });
 
 //Instance method: compare password
+
 UserSchema.methods.comparePassword = async function(candidate){
     if(!this.password){
         return false;

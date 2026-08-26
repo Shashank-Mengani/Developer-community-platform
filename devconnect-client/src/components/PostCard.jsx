@@ -6,6 +6,7 @@ const PostCard = ({ post }) => {
     const [currentPost, setCurrentPost] = useState(post);
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
+    const [bookmark, setBookmark] = useState(null);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -29,6 +30,25 @@ const PostCard = ({ post }) => {
         fetchComments();
     }, [post._id]);
 
+    useEffect(() => {
+        const fetchBookmark = async () => {
+            try {
+                const response = await api.get(
+                    `bookmark/posts/${post._id}`
+                );
+
+                setBookmark(response.data.data);
+
+            } catch (error) {
+                console.log(
+                    error.response?.data?.message ||
+                    "Failed to fetch Bookmark"
+                );
+            }
+        };
+
+        fetchBookmark();
+    }, [post._id]);
 
     const handleReaction = async (type) => {
 
@@ -94,6 +114,40 @@ const PostCard = ({ post }) => {
         }
     }
 
+    const handleBookmark = async () => {
+        try {
+            const response = await api.post(
+                `/bookmark/posts/${post._id}`
+            );
+
+            console.log("Bookmark response: ", response.data);
+
+            setBookmark(response.data.data);
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to bookmark post"
+            );
+        }
+    }
+
+    const handleRemoveBookmark = async () => {
+        try {
+            const response = await api.delete(
+                `/bookmark/posts/${bookmark._id}`
+            );
+
+            console.log("Remove Bookmark response: ", response.data);
+            setBookmark(null);
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to remove bookmark"
+            );
+        }
+    }
+
     const getReactionCount = (type) => {
         return currentPost.reactions?.filter(
             reaction => reaction.type === type
@@ -146,10 +200,7 @@ const PostCard = ({ post }) => {
 
                 <span>❤️ {getReactionCount("like")}</span>
                 <span>💕 {getReactionCount("love")}</span>
-                <span>😂 {getReactionCount("haha")}</span>
                 <span>😮 {getReactionCount("wow")}</span>
-                <span>😢 {getReactionCount("sad")}</span>
-                <span>😡 {getReactionCount("angry")}</span>
 
             </div>
 
@@ -171,32 +222,27 @@ const PostCard = ({ post }) => {
                 </button>
 
                 <button
-                    onClick={() => handleReaction("haha")}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
-                >
-                    😂 Haha
-                </button>
-
-                <button
                     onClick={() => handleReaction("wow")}
                     className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
                 >
                     😮 Wow
                 </button>
 
-                <button
-                    onClick={() => handleReaction("sad")}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
-                >
-                    😢 Sad
-                </button>
-
-                <button
-                    onClick={() => handleReaction("angry")}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
-                >
-                    😡 Angry
-                </button>
+                {bookmark ? (
+                    <button
+                        onClick={handleRemoveBookmark}
+                        className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-200 transition"
+                    >
+                        🔖 Bookmarked
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleBookmark}
+                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-100 transition"
+                    >
+                        🔖 Bookmark
+                    </button>
+                )}
 
             </div>
 

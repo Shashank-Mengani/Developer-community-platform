@@ -12,7 +12,8 @@ import googleRoutes from './routes/google.auth.route.js';
 import passport from './config/passport.js';
 import notificationRoutes from './routes/notification.route.js';
 import { errorHandler } from './middleware/error.middleware.js';
-import aiRoutes from './routes/ai.route.js'
+import aiRoutes from './routes/ai.route.js';
+import shareRoutes from './routes/share.route.js';
 import cors from 'cors';
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/post', postRoutes);
 app.use('/auth', googleRoutes);
 app.use('/posts', notificationRoutes);
 app.use('/ai', aiRoutes);
+app.use('/share', shareRoutes);
 
 app.use(errorHandler);
 
