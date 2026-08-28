@@ -5,15 +5,17 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
 
     const [user, setUser] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    console.log(unreadCount);
 
     const navigate = useNavigate();
 
     useEffect(() => {
+
         const fetchUser = async () => {
             try {
                 const response = await api.get("/auth/me");
-
-                console.log("CURRENT USER:", response.data);
 
                 setUser(response.data.data);
 
@@ -26,7 +28,41 @@ const Navbar = () => {
         };
 
         fetchUser();
+
     }, []);
+
+
+    useEffect(() => {
+
+        const fetchUnreadNotifications = async () => {
+            try {
+
+                const response = await api.get(
+                    "/notification/notifications"
+                );
+
+                const notifications = response.data.data || [];
+
+                const unread = notifications.filter(
+                    (notification) => !notification.isRead
+                ).length;
+
+                setUnreadCount(unread);
+
+            } catch (error) {
+
+                console.log(
+                    error.response?.data?.message ||
+                    "Failed to fetch notifications"
+                );
+
+            }
+        };
+
+        fetchUnreadNotifications();
+
+    }, []);
+
 
     return (
         <header className="border-b border-gray-200 bg-white">
@@ -34,32 +70,36 @@ const Navbar = () => {
             <div className="max-w-2xl mx-auto flex items-center justify-between px-4 py-4">
 
                 {/* Logo */}
+
                 <h1
-                    className="text-xl font-bold text-gray-900 cursor-pointer"
                     onClick={() => navigate("/")}
+                    className="text-xl font-bold text-gray-900 cursor-pointer"
                 >
                     DevConnect
                 </h1>
 
+
                 {/* Right side */}
-                <div className="flex items-center gap-4">
+
+                <div className="flex items-center gap-3">
+
+                    {/* User */}
 
                     {user && (
-                        <button
-                            onClick={() => navigate("/profile")}
-                            className="flex items-center gap-2"
-                        >
+                        <div className="flex items-center gap-2">
 
-                            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                
+                            <div className="w-9 h-9 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+
                                 {user.avatar ? (
                                     <img
                                         src={user.avatar}
                                         alt={user.name}
                                         className="w-full h-full object-cover"
-                                    />    
+                                    />
                                 ) : (
-                                    user.name?.charAt(0).toUpperCase()
+                                    user.name
+                                        ?.charAt(0)
+                                        .toUpperCase()
                                 )}
 
                             </div>
@@ -68,8 +108,11 @@ const Navbar = () => {
                                 {user.name}
                             </span>
 
-                        </button>
+                        </div>
                     )}
+
+
+                    {/* Sign out */}
 
                     <button
                         onClick={() => navigate("/signout")}

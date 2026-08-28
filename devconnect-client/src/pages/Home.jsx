@@ -3,6 +3,7 @@ import api from "../services/api";
 import PostCard from "../components/PostCard";
 import CreatePost from "../components/CreatePost";
 import Navbar from '../components/Navbar';
+import BottomNav from "../components/BottomNav";
 
 const Home = () => {
     const [posts, setPosts] = useState([]);
@@ -69,6 +70,8 @@ const Home = () => {
             </div>
 
         </main>
+
+        <BottomNav />
 
     </div>
 );

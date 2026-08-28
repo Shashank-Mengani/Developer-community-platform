@@ -8,6 +8,10 @@ const PostCard = ({ post }) => {
     const [comments, setComments] = useState([]);
     const [bookmark, setBookmark] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [showShareModel, setShowShareModel] = useState(false);
+    const [users, setUsers] = useState(null);
+
+    console.log(setCopied);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -150,20 +154,31 @@ const PostCard = ({ post }) => {
     }
 
     const handleShare = async () => {
-        const postUrl = `${window.location.origin}/post/${post._id}`;
-
         try {
-            await navigator.clipboard.writeText(postUrl);
+            const response = await api.get("/user");
 
-            await api.post(
-                `/notification/${post._id}/share`
-            )
-            
-            setCopied(true);
+            console.log("USERS:", response.data);
 
-            setTimeout(() => {
-                setCopied(false);
-            }, 2000);
+            setUsers(response.data.data || []);
+            setShowShareModel(true);
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to fetch users"
+            );
+        }
+    };
+
+    const handleSendPost = async (recipientId) => {
+        try {
+            const response = await api.post(
+                `/notification/${post._id}/share/${recipientId}`
+            );
+
+            console.log("SHARE RESPONSE:", response.data);
+
+            setShowShareModel(false);
 
         } catch (error) {
             console.log(
@@ -243,6 +258,79 @@ const PostCard = ({ post }) => {
                 >
                     {copied ? "✅ Link copied!" : "🔗 Share"}
                 </button>
+
+                {showShareModel && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+
+                <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+
+                    <div className="flex items-center justify-between mb-4">
+
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            Share Post
+                        </h2>
+
+                        <button
+                            onClick={() => setShowShareModel(false)}
+                            className="text-gray-400 hover:text-gray-700"
+                        >
+                            ✕
+                        </button>
+
+            </div>
+
+            <div className="space-y-3">
+
+                {users.map((user) => (
+                    <div
+                        key={user._id}
+                        className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                    >
+
+                        <div className="flex items-center gap-3">
+
+                            <div className="w-9 h-9 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+
+                                {user.avatar ? (
+                                    <img
+                                        src={user.avatar}
+                                        alt={user.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    user.name?.charAt(0).toUpperCase()
+                                )}
+
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold text-gray-900">
+                                    {user.name}
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                    @{user.username}
+                                </p>
+                            </div>
+
+                        </div>
+
+                            <button
+                                onClick={() => handleSendPost(user._id)}
+                                className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                            >
+                                Send
+                            </button>
+
+                        </div>
+                    ))}
+
+                </div>
+
+            </div>
+
+        </div>
+    )}
 
                 {/* Bookmark */}
                 {bookmark ? (

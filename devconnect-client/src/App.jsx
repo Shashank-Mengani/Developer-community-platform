@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Signout from "./pages/Signout";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
+import Explore from "./pages/Explore";
 
 
 function App() {
@@ -22,6 +24,10 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
 
                 <Route path="/signout" element={<Signout />} />
+
+                <Route path="/explore" element={<Explore />} />
+
+                <Route path="/notifications" element={<Notifications />} />
 
             </Routes>
 

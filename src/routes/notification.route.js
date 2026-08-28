@@ -4,7 +4,7 @@ import { getNotifications, markAllAsRead, markAsRead, sharePost } from '../contr
 
 const router = express.Router();
 
-router.post("/:postId/share", authenticate, sharePost);
+router.post("/:postId/share/:userId", authenticate, sharePost);
 
 router.get("/notifications", authenticate, getNotifications);
 
