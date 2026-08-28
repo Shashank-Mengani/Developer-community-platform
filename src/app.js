@@ -40,7 +40,7 @@ app.use('/comments', commentRoutes);
 app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);
 app.use('/auth', googleRoutes);
-app.use('/posts', notificationRoutes);
+app.use('/notification', notificationRoutes);
 app.use('/ai', aiRoutes);
 app.use('/share', shareRoutes);
 

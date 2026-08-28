@@ -154,6 +154,10 @@ const PostCard = ({ post }) => {
 
         try {
             await navigator.clipboard.writeText(postUrl);
+
+            await api.post(
+                `/notification/${post._id}/share`
+            )
             
             setCopied(true);
 
@@ -162,9 +166,12 @@ const PostCard = ({ post }) => {
             }, 2000);
 
         } catch (error) {
-            console.log("Failed to copy post link", error);
+            console.log(
+                error.response?.data?.message ||
+                "Failed to share post"
+            );
         }
-    }
+    };
 
     const getReactionCount = (type) => {
         return currentPost.reactions?.filter(

@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import PostCard from "../components/PostCard";
 import CreatePost from "../components/CreatePost";
-import { useNavigate } from "react-router-dom";
+import Navbar from '../components/Navbar';
 
 const Home = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("")
-
-    const navigate = useNavigate();
 
     const handlePostCreated = (newPost) => {
         setPosts((previousPosts) =>  [
@@ -41,23 +39,7 @@ const Home = () => {
     return (
     <div className="min-h-screen bg-gray-100">
 
-        {/* Top bar */}
-        <header className="border-b border-gray-200 bg-white">
-            <div className="max-w-2xl mx-auto flex items-center justify-between px-4 py-4">
-
-                <h1 className="text-xl font-bold text-gray-900">
-                    DevConnect
-                </h1>
-
-                <button
-                    onClick={() => navigate("/signout")}
-                    className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition"
-                >
-                    Sign out
-                </button>
-
-            </div>
-        </header>
+        <Navbar />
 
 
         {/* Main content */}

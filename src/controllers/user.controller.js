@@ -23,6 +23,21 @@ export const getPost = async(req, res, next) => {
     }
 }
 
+export const getAllUsers = async (req, res, next) => {
+    try {
+
+        const users = await User.find().select("-password");
+
+        res.status(200).json({
+            message: "fetched all users",
+            data: users
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const updateProfile = async(req, res, next) => {
     try {
         const { id } = req.params;

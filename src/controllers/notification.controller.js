@@ -1,12 +1,13 @@
 
 import Notification from "../models/notification.model.js";
 import Post from "../models/post.model.js"
+import User from "../models/user.model.js";
 import { AppError } from "../utils/AppError.js";
 
 export const sharePost = async(req, res, next) => {
     try {
-        const userId = req.user.id;
-        const { postId } = req.params;
+        const senderId = req.user.id;
+        const { postId, userId: recipientId } = req.params;
 
         const post = await Post.findById(postId);
                 
@@ -17,15 +18,21 @@ export const sharePost = async(req, res, next) => {
         // console.log("userId:", userId);
         // console.log("post author:", post.author);
         
-        if(post.author.toString() === userId.toString()){
+        if(senderId.toString() === recipientId.toString()){
             throw new AppError("You cannot share your own post", 400);
+        }
+        
+        const recipient = await User.findById(recipientId);
+
+        if (!recipient) {
+            throw new AppError("Recipient not found", 404);
         }
 
         const notification = await Notification.create({
-            recipient: post.author,
-            sender: userId,
-            type: "SHARE",
-            message: "Someone shared your post",
+            recipient: recipientId,
+            sender: senderId,
+            type: "Share",
+            message: "Someone shared a post with you",
             post: post._id
         });
 

@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Signout from "./pages/Signout";
+import Profile from "./pages/Profile";
 
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
                 <Route path="/signin" element={<Login />} />
 
                 <Route path="/home" element={<Home />} />
+
+                <Route path="/profile" element={<Profile />} />
 
                 <Route path="/signout" element={<Signout />} />
 
