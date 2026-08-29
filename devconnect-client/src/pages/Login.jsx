@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api'
+import { useAuth } from '../context/AuthProvider';
 
 const Login = () => {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { setUser } = useAuth();
 
   const navigate = useNavigate();
 
@@ -19,9 +22,11 @@ const Login = () => {
 
     try {
       const response = await api.post("/auth/signin", formData);
-      setMessage(response.data.message);
 
-      navigate("/home");
+      setUser(response.data.data);
+
+      navigate("/");
+
     } catch (error) {
       setMessage(
         error.response?.data?.message || "Signin failed"

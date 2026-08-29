@@ -105,7 +105,7 @@ const Notifications = () => {
                 <div className="max-w-2xl mx-auto px-4 py-4">
 
                     <button
-                        onClick={() => navigate("/home")}
+                        onClick={() => navigate("/")}
                         className="text-sm font-medium text-gray-600 hover:text-gray-900"
                     >
                         ← Back to Home
