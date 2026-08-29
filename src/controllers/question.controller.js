@@ -1,6 +1,7 @@
-import { generateQuestionTags } from '../ai-services/questionTags.service.js';
+
 import Question from '../models/question.model.js';
 import { AppError } from '../utils/AppError.js';
+import { generateTags } from '../ai-services/questionTags.service.js';
 
 export const createQuestions = async (req, res, next) => {
     try {
@@ -15,10 +16,14 @@ export const createQuestions = async (req, res, next) => {
             throw new AppError("Bad Request", 401);
         }
 
-        const aiResult = await generateQuestionTags(title, body);
+        const aiResult = await generateTags(
+            `${title}\n${body}`
+        );
+
+        console.log("AI TAG RESULT:", aiResult);
 
         let tags = [];
-        if(Array.isArray(aiResult.tags)){
+        if(Array.isArray(aiResult?.tags)){
             tags = aiResult.tags;
         }
 
@@ -55,9 +60,19 @@ export const getQuestion = async (req, res, next) => {
 
 export const getQuestionById = async (req, res, next) => {
     try {
-        const { id } = req.params.id;
+        const { questionId } = req.params;
 
-        const question = await Question.findById(req.params.id);
+        const question = await Question
+            .findById(questionId)
+            .populate("author", "name username");
+    
+        if (!question) {
+            throw new AppError(
+                "Question not found",
+                404
+            );
+        }
+
         res.status(200).json({
             message: "Retrieved question succesfully",
             data: question

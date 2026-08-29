@@ -1,13 +1,11 @@
 import express from 'express';
-import { answerVote, answerVotesById, questionVote, questionVotesById } from '../controllers/vote.controller.js';
 import { authenticate } from '../middleware/auth.protect.js';
+import { getVoteStatus, vote } from '../controllers/vote.controller.js';
 
 const voteRouter = express.Router();
 
-voteRouter.post('/questions/:id', authenticate, questionVote);
-voteRouter.post('/answers/:id', authenticate, answerVote);
+voteRouter.post('/', authenticate, vote);
 
-voteRouter.get('/questions/:id', questionVotesById);
-voteRouter.get('/answers/:id', answerVotesById);
+voteRouter.get('/:targetType/:targetId', authenticate, getVoteStatus);
 
 export default voteRouter;

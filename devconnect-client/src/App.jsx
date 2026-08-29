@@ -10,7 +10,8 @@ import Explore from "./pages/Explore";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Settings from "./pages/Settings";
 import Layout from "./layouts/Layout";
-
+import QuestionDetail from "./pages/QuestionDetail";
+import AskQuestion from "./pages/AskQuestion";
 
 function App() {
     return (
@@ -39,6 +40,16 @@ function App() {
                             <Home />
                         </ProtectedRoute>
                     } />
+
+                <Route
+                    path="/questions/:questionId"
+                    element={<QuestionDetail />}
+                />
+
+                <Route
+                    path="/questions/ask"
+                    element={<AskQuestion />}
+                />    
 
                 <Route
                     path="/profile"

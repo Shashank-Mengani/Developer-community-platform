@@ -5,9 +5,9 @@ import { authenticate } from "../middleware/auth.protect.js";
 const router = express.Router();
 
 router.post('/', authenticate, createQuestions);
-router.get('/', getQuestion);
-router.get('/:id', getQuestionById);
-router.put('/:id', updateQuestion);
-router.delete('/:id', deleteQuestion);
+router.get('/', authenticate, getQuestion);
+router.get('/:questionId', authenticate, getQuestionById);
+router.put('/:questionId', authenticate, updateQuestion);
+router.delete('/:questionId', authenticate, deleteQuestion);
 
 export default router;

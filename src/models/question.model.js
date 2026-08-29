@@ -10,12 +10,13 @@ const questionSchema = new mongoose.Schema({
 
     body: {
         type: String,
-        required: true
+        required: true,
     },
 
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
 
     views: {
@@ -38,14 +39,15 @@ const questionSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        default: []
         }
     ],
 
-    acceptAnswer: {
+    acceptedAnswer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Answer"
+        ref: "Answer",
+        default: null
     }
+    
 }, { timestamps: true });
 
 const Question = mongoose.model("Question", questionSchema);

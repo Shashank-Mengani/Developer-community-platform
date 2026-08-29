@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Question from "./question.model.js";
 
 const answerSchema = new mongoose.Schema({
     body: {
@@ -10,12 +9,14 @@ const answerSchema = new mongoose.Schema({
 
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
 
     question: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Question"
+        ref: "Question",
+        required: true
     },
 
     voteCount: {
@@ -23,15 +24,11 @@ const answerSchema = new mongoose.Schema({
         default: 0
     },
 
-    tags: {
-        type: [String],
-        default: []
-    },
-
     isAccepted: {
         type: Boolean,
         default: false
     }
+    
 }, { timestamps: true });
 
 const Answer = mongoose.model("Answer", answerSchema);

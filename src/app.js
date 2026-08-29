@@ -35,7 +35,7 @@ app.use('/auth', authRoute);
 app.use('/user', userRoute);
 app.use('/question', questionRoute);
 app.use('/answer', answerRoute);
-app.use('/votes', voteRoutes);
+app.use('/vote', voteRoutes);
 app.use('/comments', commentRoutes);
 app.use('/bookmark', bookmarkRoutes);
 app.use('/post', postRoutes);

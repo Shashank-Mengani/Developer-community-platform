@@ -1,17 +1,28 @@
 import { generateAIResponse } from "./generateAIResponse.service.js"
 
-export const generateQuestionTags = (title, body) => {             
-
+export const generateTags = async (question) => {
     return generateAIResponse({
         systemPrompt: `
-            you are a developer community assisstant.
-            Generate relevant programming tags.
-            return maximum a 5 tags.
+            You are a senior software engineer.
+
+            Generate relevant tags for the given developer question.
+
+            Rules:
+            - Return a maximum of 5 tags.
+            - Tags must be concise.
+            - Tags must be relevant to the question.
+            - Tags must be lowercase.
+            - Return ONLY valid JSON.
+            - The JSON must be an object with a "tags" array.
+
+            Example:
+            {
+                "tags": ["express", "jwt", "authentication"]
+            }
         `,
 
         userPrompt: `
-            Question tile: ${title}
-            Question description: ${body}
+            Question: ${question}
         `
     });
 }

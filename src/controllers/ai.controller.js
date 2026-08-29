@@ -1,10 +1,10 @@
-import { success } from "zod";
+
 import { reviewCode } from "../ai-services/codeReview.service.js";
 import { explainTheCode } from "../ai-services/codeExplain.service.js";
-import { generateQuestionTags } from "../ai-services/questionTags.service.js";
+import { generateTags } from "../ai-services/questionTags.service.js";
 
 
-export const codeReview = async (req, res, next) => {
+export const codeReview = async (req, res) => {
     try {
         const { code, language } = req.body;
 
@@ -63,34 +63,31 @@ export const explainCode = async (req, res) => {
     }
 }
 
-export const questionTag = async (req, res) => {
+export const generateQuestionTag = async (req, res) => {
     try {
+        const { question } = req.body;
 
-        const { title, description } = req.body;
-
-        if(!title || !description){
+        if (!question) {
             return res.status(400).json({
-                success: false,
-                message: "Title and Describtion fields are required"
+                message: "Question is required",
+                success: false
             });
         }
 
-        const result = await generateQuestionTags(
-            title,
-            description
-        );
+        const questionTags = await generateTags(question);
 
         res.status(200).json({
             success: true,
-            data: result
+            data: questionTags
         });
+
+        console.log(questionTags);
 
     } catch (error) {
-        console.error("AI question tags error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to generate question tags"
+        console.log(error);
+        res.status(500).json({
+            message: "Failed to generate question tags",
+            success: false
         });
     }
-}
+};
