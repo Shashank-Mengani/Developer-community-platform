@@ -47,6 +47,7 @@ export const createAnswer = async (req, res, next) => {
     }
 }
 
+
 export const getAnswer = async (req, res, next) => {
     try {
 
@@ -69,6 +70,7 @@ export const getAnswer = async (req, res, next) => {
     }
 }
 
+
 export const getAnswerById = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -84,24 +86,55 @@ export const getAnswerById = async (req, res, next) => {
     }
 }
 
-export const updateAnswer = async (req, res, next) => {
-    try {
-        const { id } = req.params;
 
-        const answer = await Answer.findByIdAndUpdate(id, req.body, {
-            new: true,
-            runValidators: true
-        });
+export const deleteAnswer = async (req, res, next) => {
+    try {
+
+        const { answerId } = req.params;
+        const userId = req.user.id;
+
+        const answer = await Answer.findById(answerId);
+
+        if (!answer) {
+            throw new AppError("Answer not found", 404);
+        }
+
+        if (answer.author.toString() !== userId.toString()) {
+            throw new AppError("You are not authorized to delete this answer", 403);
+        }
+
+        const question = await Question.findById(answer.question);
+
+        await Answer.findByIdAndDelete(answerId);
+
+        if (question) {
+
+            question.answerCount = Math.max(
+                0,
+                question.answerCount - 1
+            );
+
+            if (
+                question.acceptedAnswer &&
+                question.acceptedAnswer.toString() ===
+                answerId.toString()
+            ) {
+                question.acceptedAnswer = null;
+            }
+
+            await question.save();
+        }
 
         res.status(200).json({
-            message: "Answer updated successfully",
-            data: answer
+            message:
+                "Answer deleted successfully"
         });
 
     } catch (error) {
         next(error);
     }
-}
+};
+
 
 export const acceptAnswer = async (req, res, next) => {
     try {

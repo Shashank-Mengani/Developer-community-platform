@@ -9,7 +9,7 @@ export const createQuestions = async (req, res, next) => {
         const { title, body } = req.body;
 
         const existingQuestion = await Question.findOne({
-            title: title
+            title: title.trim()
         });
 
         if(existingQuestion){
@@ -29,8 +29,8 @@ export const createQuestions = async (req, res, next) => {
 
         const question = await Question.create({
             author: userId,
-            title,
-            body,
+            title: title.trim(),
+            body: body.trim(),
             tags
         });
 
@@ -46,26 +46,39 @@ export const createQuestions = async (req, res, next) => {
 
 export const getQuestion = async (req, res, next) => {
     try {
-        const questions = await Question.find();
 
-        res.status(200).json({ 
-            message: "questions fetched successfully",
+        const questions = await Question.find()
+            .populate("author", "name username")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            message: "Questions fetched successfully",
             data: questions
         });
 
     } catch (error) {
         next(error);
     }
-}
+};
+
 
 export const getQuestionById = async (req, res, next) => {
     try {
         const { questionId } = req.params;
 
-        const question = await Question
-            .findById(questionId)
-            .populate("author", "name username");
-    
+        const question = await Question.findByIdAndUpdate(
+            questionId,
+            {
+                $inc: {
+                    views: 1
+                }
+            },
+            {
+                new: true
+            }
+        )
+        .populate("author", "name username");
+
         if (!question) {
             throw new AppError(
                 "Question not found",
@@ -74,40 +87,172 @@ export const getQuestionById = async (req, res, next) => {
         }
 
         res.status(200).json({
-            message: "Retrieved question succesfully",
+            message: "Question retrieved successfully",
             data: question
         });
 
     } catch (error) {
         next(error);
     }
-}
+};
 
-export const updateQuestion = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        const question = await Question.findByIdAndUpdate(id, req.body, { new: true });
-        res.status(200).json({ 
-            message: "Updated question successfully",
-            data: question
-        });
-
-    } catch (error) {
-        next(error);
-    }
-}
 
 export const deleteQuestion = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { questionId } = req.params;
+        const userId = req.user.id;
 
-        const question = await Question.findByIdAndDelete(id);
+        const question = await Question.findById(questionId);
+
         if(!question){
             throw new AppError("Question not found", 404);
         }
-        res.status(200).json({ message: "Question deleted successfully" });
+
+        if(question.author.toString() !== userId.toString()){
+            throw new AppError("You are not authorized to delete this question", 403);
+        }
+
+        await Question.findByIdAndDelete(questionId);
+
+        res.status(200).json({ 
+            message: "Question deleted successfully" 
+        });
+
     } catch (error) {
         next(error);
     }
 }
+
+
+export const getQuestionBySearch = async (req, res, next) => {
+    try {
+
+        const { search } = req.query;
+
+        if (!search?.trim()) {
+            throw new AppError(
+                "Search query is required",
+                400
+            );
+        }
+
+        const questions = await Question.find({
+            $or: [
+                {
+                    title: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    body: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    tags: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                }
+            ]
+        })
+        .populate("author", "name username")
+        .sort({
+            createdAt: -1
+        });
+
+        res.status(200).json({
+            message: "Questions found",
+            data: questions
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const getQuestionByVotes = async (req, res, next) => {
+    try {
+
+        const questions = await Question.find()
+            .populate("author", "name username")
+            .sort({
+                voteCount: -1
+            });
+
+        res.status(200).json({
+            message: "Questions sorted by votes",
+            data: questions
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const getQuestionByAnswers = async (req, res, next) => {
+    try {
+
+        const questions = await Question.find()
+            .populate("author", "name username")
+            .sort({
+                answerCount: -1
+            });
+
+        res.status(200).json({
+            message: "Questions sorted by answers",
+            data: questions
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const getQuestionsByTag = async (req, res, next) => {
+    try {
+
+        const { tag } = req.params;
+
+        if (!tag?.trim()) {
+            throw new AppError("Tag is required", 400);
+        }
+
+        const questions = await Question.find({
+            tags: tag.trim().toLowerCase()
+        })
+        .populate("author", "name username")
+        .sort({
+            createdAt: -1
+        });
+
+        res.status(200).json({
+            message: "Questions fetched by tag successfully",
+            data: questions
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const getAllQuestionTags = async (req, res, next) => {
+    try {
+
+        const tags = await Question.distinct("tags");
+
+        res.status(200).json({
+            message: "Question tags fetched successfully",
+            data: tags.sort()
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
