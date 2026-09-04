@@ -12,6 +12,9 @@ import Settings from "./pages/Settings";
 import Layout from "./layouts/Layout";
 import QuestionDetail from "./pages/QuestionDetail";
 import AskQuestion from "./pages/AskQuestion";
+import Hackathon from "./pages/Hackathons";
+import HackathonDetail from "./pages/HackathonDetail";
+import CreateHackathon from "./pages/CreateHackathon";
 
 function App() {
     return (
@@ -50,6 +53,21 @@ function App() {
                     path="/questions/ask"
                     element={<AskQuestion />}
                 />    
+
+                <Route 
+                    path="/hackathon"
+                    element={<Hackathon />} 
+                />
+
+                <Route 
+                    path="/hackathons/:hackathonId"
+                    element={<HackathonDetail />}
+                />
+
+                <Route
+                    path="/hackathons/create"
+                    element={<CreateHackathon />}
+                    />
 
                 <Route
                     path="/profile"

@@ -8,7 +8,7 @@ export const generateTags = async (question) => {
             Generate relevant tags for the given developer question.
 
             Rules:
-            - Return a maximum of 5 tags.
+            - Return a maximum of 2 tags.
             - Tags must be concise.
             - Tags must be relevant to the question.
             - Tags must be lowercase.

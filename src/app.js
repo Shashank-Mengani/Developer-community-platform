@@ -14,6 +14,7 @@ import notificationRoutes from './routes/notification.route.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import aiRoutes from './routes/ai.route.js';
 import shareRoutes from './routes/share.route.js';
+import hackRoutes from './routes/hackathon.route.js';
 import cors from 'cors';
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/auth', googleRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/ai', aiRoutes);
 app.use('/share', shareRoutes);
+app.use('/hackathon', hackRoutes);
 
 app.use(errorHandler);
 

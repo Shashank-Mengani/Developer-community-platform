@@ -1,9 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "../services/api"
+import api from "../services/api";
 
 const BottomNav = () => {
-
     const [unreadCount, setUnreadCount] = useState(0);
 
     const navigate = useNavigate();
@@ -14,30 +13,30 @@ const BottomNav = () => {
     };
 
     useEffect(() => {
-    const fetchUnreadNotifications = async () => {
-        try {
-            const response = await api.get(
-                "/notification/notifications"
-            );
+        const fetchUnreadNotifications = async () => {
+            try {
+                const response = await api.get(
+                    "/notification/notifications"
+                );
 
-            const notifications = response.data.data || [];
+                const notifications = response.data.data || [];
 
-            const unread = notifications.filter(
-                (notification) => !notification.isRead
-            ).length;
+                const unread = notifications.filter(
+                    (notification) => !notification.isRead
+                ).length;
 
-            setUnreadCount(unread);
+                setUnreadCount(unread);
 
-        } catch (error) {
-            console.log(
-                error.response?.data?.message ||
-                "Failed to fetch notifications"
-            );
-        }
-    };
+            } catch (error) {
+                console.log(
+                    error.response?.data?.message ||
+                    "Failed to fetch notifications"
+                );
+            }
+        };
 
-    fetchUnreadNotifications();
-}, []);
+        fetchUnreadNotifications();
+    }, []);
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white">
@@ -82,6 +81,25 @@ const BottomNav = () => {
                 </button>
 
 
+                {/* Hackathons */}
+                <button
+                    onClick={() => navigate("/hackathon")}
+                    className={`flex flex-col items-center gap-1 text-xs font-medium transition ${
+                        isActive("/hackathons")
+                            ? "text-blue-600"
+                            : "text-gray-500 hover:text-gray-900"
+                    }`}
+                >
+                    <span className="text-xl">
+                        🏆
+                    </span>
+
+                    <span>
+                        Hackathons
+                    </span>
+                </button>
+
+
                 {/* Activity */}
                 <button
                     onClick={() => navigate("/notifications")}
@@ -104,6 +122,10 @@ const BottomNav = () => {
                         )}
 
                     </div>
+
+                    <span>
+                        Notifications
+                    </span>
                 </button>
 
 

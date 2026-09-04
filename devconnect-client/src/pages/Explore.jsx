@@ -180,6 +180,14 @@ const Explore = () => {
                 <div className="mb-6 flex items-start justify-between gap-4">
 
                     <div>
+
+                    <button
+                        onClick={() => navigate("/")}
+                        className="text-sm text-gray-500 hover:text-gray-900"
+                    >
+                        ← Back to Home
+                    </button>
+
                         <h1 className="text-2xl font-bold text-gray-900">
                             Explore Questions
                         </h1>

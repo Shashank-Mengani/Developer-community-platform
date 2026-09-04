@@ -1,11 +1,14 @@
 import { useState } from "react"
 import api from '../services/api'
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navignate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +21,11 @@ function Signup() {
 
     try {
       const response = await api.post("/auth/signup", formData);
+
+      navignate('/');
+
       setMessage(response.data.message);
+      
     } catch (error) {
       setMessage(
         error.response?.data?.message || "Signup failed"
