@@ -113,9 +113,12 @@ The platform helps developers:
        - git clone <your-repository-url>
 - 2. Navigate to the project
       - cd DevConnect
-- 3. Install backend dependencies
+- 3. Start the backend
+      - Open terminal:
+        - cd backend
+- 4. Install backend dependencies
       - npm install
-- 4. Configure environment variables
+- 5. Configure environment variables
      -  Create a .env file:
         - PORT=3000
         - MONGODB_URI=your_mongodb_connection_string
@@ -131,6 +134,6 @@ The platform helps developers:
 
 - 6. Start the frontend
       - Open another terminal:
-        - cd devconnect-client
+        - cd frontend
         - npm install
         - npm run dev
