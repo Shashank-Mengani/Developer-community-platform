@@ -1,6 +1,6 @@
 import { Resend } from "resend";
-import { email } from "zod";
 import 'dotenv/config';
+
 export const resendClient = new Resend(process.env.RESEND_API_KEY);
 
 export const sender = {
