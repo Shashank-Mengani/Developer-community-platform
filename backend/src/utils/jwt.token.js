@@ -9,7 +9,7 @@ export const generateAccessToken = (userId, res) => {
     res.cookie("accessToken", accesstoken, {
         httpOnly: true,
         secure: true,
-        sameSite: none,
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24
     });
     return accesstoken;
@@ -24,7 +24,7 @@ export const generaterefreshToken = (userId, res) => {
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: none,
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7
     });
 
