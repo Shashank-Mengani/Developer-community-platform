@@ -29,13 +29,8 @@ const Hackathons = () => {
 
         const result = response.data;
 
-        if (!response.ok) {
-          throw new Error(
-            result.message || "Failed to fetch hackathons"
-          );
-        }
-
         setHackathons(result.data);
+
       } catch (error) {
         setError(error.message);
       } finally {
@@ -92,11 +87,7 @@ const Hackathons = () => {
 
       const result = response.data;
 
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to delete hackathon"
-        );
-      }
+      setHackathons(result.data);
 
       // Remove deleted hackathon from current state
       setHackathons((previousHackathons) =>

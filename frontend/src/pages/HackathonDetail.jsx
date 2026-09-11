@@ -23,13 +23,8 @@ const HackathonDetail = () => {
 
         const result = response.data;
 
-        if (!response.ok) {
-          throw new Error(
-            result.message || "Failed to fetch hackathon"
-          );
-        }
-
         setHackathon(result.data);
+
       } catch (error) {
         setError(error.message);
       } finally {
@@ -52,17 +47,12 @@ const HackathonDetail = () => {
 
       const result = response.data;
 
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to register"
-        );
-      }
-
       setHackathon((previous) => ({
         ...previous,
         isRegistered: true,
         participantsCount: result.data.participantsCount,
       }));
+
     } catch (error) {
       setError(error.message);
     } finally {
@@ -90,17 +80,12 @@ const HackathonDetail = () => {
 
       const result = response.data;
 
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to unregister"
-        );
-      }
-
       setHackathon((previous) => ({
         ...previous,
         isRegistered: false,
         participantsCount: result.data.participantsCount,
       }));
+      
     } catch (error) {
       setError(error.message);
     } finally {

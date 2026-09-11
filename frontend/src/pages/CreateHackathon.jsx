@@ -75,13 +75,8 @@ const CreateHackathon = () => {
 
       const result = response.data;
 
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to create hackathon"
-        );
-      }
-
       navigate(`/hackathons/${result.data._id}`);
+      
     } catch (error) {
       setError(error.message);
     } finally {
