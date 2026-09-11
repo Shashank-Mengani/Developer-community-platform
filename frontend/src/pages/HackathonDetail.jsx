@@ -11,22 +11,27 @@ const HackathonDetail = () => {
   const [error, setError] = useState("");
   const [registering, setRegistering] = useState(false);
 
+  // Get logged-in user
+  const storedUser = localStorage.getItem("user");
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
   useEffect(() => {
     const fetchHackathon = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const response = await api.get(
-          `/hackathon/${hackathonId}`
-        );
+        const response = await api.get(`/hackathon/${hackathonId}`);
 
         const result = response.data;
 
         setHackathon(result.data);
-
       } catch (error) {
-        setError(error.message);
+        setError(
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to load hackathon."
+        );
       } finally {
         setLoading(false);
       }
@@ -35,8 +40,21 @@ const HackathonDetail = () => {
     fetchHackathon();
   }, [hackathonId]);
 
+  // Check whether current user created this hackathon
+  const isCreator =
+    currentUser &&
+    hackathon?.author &&
+    String(currentUser._id || currentUser.id) ===
+      String(hackathon.author._id || hackathon.author.id);
+
   // Register for hackathon
   const handleRegister = async () => {
+    // Prevent creator from registering
+    if (isCreator) {
+      setError("You cannot register for a hackathon that you created.");
+      return;
+    }
+
     try {
       setRegistering(true);
       setError("");
@@ -52,9 +70,11 @@ const HackathonDetail = () => {
         isRegistered: true,
         participantsCount: result.data.participantsCount,
       }));
-
     } catch (error) {
-      setError(error.message);
+      setError(
+        error.response?.data?.message ||
+        "Unable to register for this hackathon."
+      );
     } finally {
       setRegistering(false);
     }
@@ -85,9 +105,11 @@ const HackathonDetail = () => {
         isRegistered: false,
         participantsCount: result.data.participantsCount,
       }));
-      
     } catch (error) {
-      setError(error.message);
+      setError(
+        error.response?.data?.message ||
+        "Unable to unregister from this hackathon."
+      );
     } finally {
       setRegistering(false);
     }
@@ -178,9 +200,7 @@ const HackathonDetail = () => {
               </p>
 
               <p className="mt-1 font-semibold text-gray-900">
-                {new Date(
-                  hackathon.startDate
-                ).toLocaleString()}
+                {new Date(hackathon.startDate).toLocaleString()}
               </p>
             </div>
 
@@ -191,9 +211,7 @@ const HackathonDetail = () => {
               </p>
 
               <p className="mt-1 font-semibold text-gray-900">
-                {new Date(
-                  hackathon.endDate
-                ).toLocaleString()}
+                {new Date(hackathon.endDate).toLocaleString()}
               </p>
             </div>
 
@@ -276,7 +294,21 @@ const HackathonDetail = () => {
           </div>
 
           {/* Registration Button */}
-          {registrationClosed ? (
+          {isCreator ? (
+            <div className="mt-6">
+              <button
+                type="button"
+                disabled
+                className="w-full cursor-not-allowed rounded-lg bg-gray-400 px-5 py-3 font-semibold text-white"
+              >
+                You are the Organizer
+              </button>
+
+              <p className="mt-2 text-center text-sm text-gray-500">
+                You cannot register for a hackathon you created.
+              </p>
+            </div>
+          ) : registrationClosed ? (
             <button
               type="button"
               disabled
