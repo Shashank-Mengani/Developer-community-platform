@@ -8,9 +8,9 @@ export const generateAccessToken = (userId, res) => {
 
     res.cookie("accessToken", accesstoken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 1
+        secure: true,
+        sameSite: none,
+        maxAge: 1000 * 60 * 60 * 24
     });
     return accesstoken;
 }
@@ -23,8 +23,8 @@ export const generaterefreshToken = (userId, res) => {
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: none,
         maxAge: 1000 * 60 * 60 * 24 * 7
     });
 
