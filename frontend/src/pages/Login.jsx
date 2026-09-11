@@ -23,6 +23,8 @@ const Login = () => {
     try {
       const response = await api.post("/auth/signin", formData);
 
+      localStorage.setItem("token", response.data.data.token);
+
       setUser(response.data.data);
 
       navigate("/");
