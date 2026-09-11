@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const CreateHackathon = () => {
   const navigate = useNavigate();
@@ -62,27 +63,17 @@ const CreateHackathon = () => {
         return;
         }
 
-      const response = await fetch(
-        "http://localhost:3000/hackathon",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            title: formData.title.trim(),
-            imageUrl: formData.imageUrl.trim(),
-            startDate: formData.startDate,
-            endDate: formData.endDate,
-            registrationDeadline: formData.registrationDeadline,
-            prizes: formData.prizes.trim(),
-            mode: formData.mode,
-          }),
-        }
-      );
+      const response = await api.post("/hackathon", {
+        title: formData.title.trim(),
+        imageUrl: formData.imageUrl.trim(),
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        registrationDeadline: formData.registrationDeadline,
+        prizes: formData.prizes.trim(),
+        mode: formData.mode,
+      });
 
-      const result = await response.json();
+      const result = response.data;
 
       if (!response.ok) {
         throw new Error(

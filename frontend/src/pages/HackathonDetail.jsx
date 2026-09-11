@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "../services/api";
 
 const HackathonDetail = () => {
   const { hackathonId } = useParams();
@@ -16,14 +17,11 @@ const HackathonDetail = () => {
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          `http://localhost:3000/hackathon/${hackathonId}`,
-          {
-            credentials: "include",
-          }
+        const response = await api.get(
+          `/hackathon/${hackathonId}`
         );
 
-        const result = await response.json();
+        const result = response.data;
 
         if (!response.ok) {
           throw new Error(
@@ -48,15 +46,11 @@ const HackathonDetail = () => {
       setRegistering(true);
       setError("");
 
-      const response = await fetch(
-        `http://localhost:3000/hackathon/${hackathonId}/register`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
+      const response = await api.post(
+        `/hackathon/${hackathonId}/register`
       );
 
-      const result = await response.json();
+      const result = response.data;
 
       if (!response.ok) {
         throw new Error(
@@ -90,15 +84,11 @@ const HackathonDetail = () => {
       setRegistering(true);
       setError("");
 
-      const response = await fetch(
-        `http://localhost:3000/hackathon/${hackathonId}/unregister`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
+      const response = await api.post(
+        `/hackathon/${hackathonId}/unregister`
       );
 
-      const result = await response.json();
+      const result = response.data;
 
       if (!response.ok) {
         throw new Error(

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import api from "../services/api";
 
 const Hackathons = () => {
   const [search, setSearch] = useState("");
@@ -20,17 +21,13 @@ const Hackathons = () => {
         setLoading(true);
         setError("");
 
-        const url = search.trim()
-          ? `http://localhost:3000/hackathon/search?search=${encodeURIComponent(
-              search.trim()
-            )}`
-          : "http://localhost:3000/hackathon";
+        const response = search.trim()
+          ? await api.get(
+              `/hackathon/search?search=${encodeURIComponent(search.trim())}`
+            )
+          : await api.get("/hackathon");
 
-        const response = await fetch(url, {
-          credentials: "include",
-        });
-
-        const result = await response.json();
+        const result = response.data;
 
         if (!response.ok) {
           throw new Error(
@@ -89,15 +86,11 @@ const Hackathons = () => {
       setDeletingId(hackathonId);
       setError("");
 
-      const response = await fetch(
-        `http://localhost:3000/hackathon/${hackathonId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
+      const response = await api.delete(
+        `/hackathon/${hackathonId}`
       );
 
-      const result = await response.json();
+      const result = response.data;
 
       if (!response.ok) {
         throw new Error(
