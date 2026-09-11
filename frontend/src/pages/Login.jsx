@@ -23,7 +23,7 @@ const Login = () => {
     try {
       const response = await api.post("/auth/signin", formData);
 
-      localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("token", response.data.accessToken);
 
       setUser(response.data.data);
 

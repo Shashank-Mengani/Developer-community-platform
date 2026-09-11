@@ -2,15 +2,18 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../utils/AppError.js';
 
 export const authenticate = (req, res, next) => {
-
-    const token = req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
-
-    if(!token){
-        throw new AppError("No token provided", 401);
-    }
-
     try {
-        
+        const authHeader = req.headers.authorization;
+
+        const token =
+            authHeader?.startsWith("Bearer ")
+                ? authHeader.split(" ")[1]
+                : req.cookies.accessToken;
+
+        if (!token) {
+            return next(new AppError("No token provided", 401));
+        }
+
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
@@ -19,8 +22,7 @@ export const authenticate = (req, res, next) => {
         req.user = decoded;
 
         next();
-
     } catch (error) {
         next(new AppError("Invalid or expired token", 401));
     }
-}
+};

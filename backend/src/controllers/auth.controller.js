@@ -96,8 +96,8 @@ export const signOut = (req, res, next) => {
     try {
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict"
+            secure: true,
+            sameSite: "none"
         };
 
         res.clearCookie("accessToken", cookieOptions);
