@@ -23,11 +23,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://developer-community-0s4n.onrender.com",
+];
+
 app.use(
-    cors({
-        origin: "http://localhost:5173",
-        credentials: true
-    })
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
 );
 
 app.use(passport.initialize());
