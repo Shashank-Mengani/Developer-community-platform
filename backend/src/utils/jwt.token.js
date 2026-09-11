@@ -10,7 +10,7 @@ export const generateAccessToken = (userId, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 1000 * 60 * 60 * 24
+        maxAge: 1000 * 60 * 15
     });
     return accesstoken;
 }

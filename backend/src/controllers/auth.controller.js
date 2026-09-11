@@ -134,10 +134,11 @@ export const refreshAccessToken = async (req, res, next) => {
         }
         
         const accessToken = generateAccessToken(user._id, res);
+
+        generaterefreshToken(user._id, res);
         
         res.status(200).json({
-            message: "Access token refreshed",
-            data: accessToken
+            message: "Access token refreshed"
         });
 
     } catch (error) {
