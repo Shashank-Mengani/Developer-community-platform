@@ -1,11 +1,43 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const Profile = () => {
 
     const { user, loading } = useAuth();
+    const [posts, setPosts] = useState([]);
 
     const navigate = useNavigate();
+
+    
+    useEffect(() => {
+        const fetchPosts = async () => {
+            if(!user?._id) return;
+
+            try {
+                const response = await api.get(
+                    `/post/user/${user._id}`
+                );
+
+                setPosts(response.data.data);
+
+            } catch (error) {
+                console.log(
+                    error.response?.data?.message ||
+                    "Failed to fetch posts"
+                );
+
+                setPosts([]);
+            }
+        }
+        fetchPosts();
+    }, [user?._id]);
+
+    const postsCount = posts.length;
+
+    const followersCount = user.followers?.length || 0;
+    const followingCount = user.following?.length || 0;
 
     if (loading) {
         return (
@@ -69,6 +101,37 @@ const Profile = () => {
                         <p className="text-gray-500 mt-1">
                             {user?.email}
                         </p>
+
+                        <div className="flex items-center justify-center gap-10 mt-6">
+
+                            {/* posts */}
+                            <div className="flex flex-col items-center">
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {postsCount}
+                                </strong>
+                                <span className="text-sm text-gray-500">Posts</span>
+                            </div>
+                            
+                            {/* followers */}
+                            <div className="flex flex-col items-center">
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {followersCount}
+                                </strong>
+                                <span className="text-sm text-gray-500">
+                                    Followers
+                                </span>
+                            </div>
+
+                            {/* following */}
+                            <div className="flex flex-col items-center">
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {followingCount}
+                                </strong>
+                                <span className="text-sm text-gray-500">
+                                    Following
+                                </span>
+                            </div>
+                        </div>
 
                     </div>
 
