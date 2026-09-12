@@ -79,6 +79,11 @@ function App() {
                 />
 
                 <Route
+                    path="/profile/:id"
+                    element={<Profile />}
+                />    
+
+                <Route
                     path="/explore"
                     element={
                         <ProtectedRoute>

@@ -1,9 +1,11 @@
 import express from 'express';
-import { followUser, getAllUsers, getPost, unFollowUser, updateProfile, uploadProfileImage } from '../controllers/user.controller.js';
+import { followUser, getAllUsers, getPost, searchUsers, unFollowUser, updateProfile, uploadProfileImage } from '../controllers/user.controller.js';
 import { authenticate } from '../middleware/auth.protect.js';
 import upload from '../middleware/upload.middleware.js';
 
 const router = express.Router();
+
+router.get('/search', authenticate, searchUsers);
 
 router.get('/:id', authenticate, getPost);
 

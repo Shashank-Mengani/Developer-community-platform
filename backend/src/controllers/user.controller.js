@@ -98,12 +98,50 @@ export const uploadProfileImage = async (req, res, next) => {
     }
 }
 
+export const searchUsers = async (req, res, next) => {
+    try {
+        const { q } = req.query;
+        
+        if(!q || !q.trim){
+            throw new AppError("No search query", 200);
+        }
+
+        const search = q.trim();
+
+        const users = await User.find({
+            $or: [
+                { 
+                    name: { 
+                        $regex: search, 
+                        $options: "i"
+                    } 
+                },
+                { 
+                    username: { 
+                        $regex: search, 
+                        $options: "i"
+                    } 
+                }
+            ]
+        })
+        .select("name username avatar bio")
+        .limit(10);
+
+        res.status(200).json({
+            message: "Users found successfully",
+            data: users
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const followUser = async (req, res, next) => {
     try {
         const currUserId = req.user.id;
         const targetUserId = req.params.id;
 
-        
         console.log(targetUserId);
 
         if(currUserId === targetUserId){
