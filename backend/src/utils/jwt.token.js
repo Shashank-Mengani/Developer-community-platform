@@ -3,14 +3,14 @@ import jwt from 'jsonwebtoken';
 export const generateAccessToken = (userId, res) => {
     const payload = { id: userId };
     const accesstoken = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || "15m"
+        expiresIn: process.env.JWT_EXPIRES_IN || "1d"
     });
 
     res.cookie("accessToken", accesstoken, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 1000 * 60 * 15
+        maxAge: 1000 * 60 * 60 * 24 * 1
     });
     return accesstoken;
 }
