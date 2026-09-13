@@ -182,6 +182,10 @@ export const unFollowUser = async (req, res, next) => {
         const currUserId = req.user.id;
         const targetUserId = req.params.id;
 
+        if (currUserId === targetUserId) {
+            throw new AppError("You cannot unfollow yourself", 400);
+        }
+
         const currUser = await User.findById(currUserId);
         const userToUnfollow = await User.findById(targetUserId);
 
@@ -195,7 +199,7 @@ export const unFollowUser = async (req, res, next) => {
 
         currUser.following = currUser.following.filter(id => id.toString() !== targetUserId);
 
-        userToUnfollow.followers = userToUnfollow.followers(id => id.toString !== currUser);
+        userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString !== currUser);
 
         await currUser.save();
         await userToUnfollow.save();
