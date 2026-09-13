@@ -52,15 +52,11 @@ export const createPost = async (req, res, next) => {
 
 export const getPostsByUser = async (req, res, next) => {
     try {
-        const userId = req.user.id;
+        const userId = req.params.id;
 
         const posts = await Post.find({
             author: userId
-        }).populate("author", "name username");
-
-        if(posts.length === 0){
-            throw new AppError("Posts not found", 404);
-        }
+        }).populate("author", "name username").sort({ createdAt: -1 });
 
         res.status(200).json({
             message: "User posts fetched successfully",
