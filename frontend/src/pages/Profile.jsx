@@ -21,25 +21,23 @@ const Profile = () => {
     // Fetch profile user
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!userId) return;
+            if (loading || !userId) return;
 
             try {
                 const response = await api.get(`/user/${userId}`);
 
                 console.log("Profile API response:", response.data);
 
-                const fetchedUser = response.data.data;
-
-                setProfileUser(fetchedUser);
+                setProfileUser(response.data.data);
 
                 // Check whether current user follows this profile
-                if (currentUser?._id && currentUser._id !== userId) {
+                if (currentUser?._id && currentUser._id.toString() !== userId.toString()) {
                     const following = currentUser.following?.some(
                         (followingId) =>
                             followingId.toString() === userId.toString()
                     );
 
-                    setIsFollowing(following);
+                    setIsFollowing(!!following);
                 }
             } catch (error) {
                 console.log(
@@ -52,7 +50,7 @@ const Profile = () => {
         };
 
         fetchProfile();
-    }, [userId, currentUser]);
+    }, [userId, currentUser, loading]);
 
     // Fetch posts
     useEffect(() => {
