@@ -58,7 +58,7 @@ const Settings = () => {
 
                             <p className="font-medium text-gray-900 mt-1">
                                 {user?.name}
-                            </p>
+                            </p> 
 
                         </div>
 

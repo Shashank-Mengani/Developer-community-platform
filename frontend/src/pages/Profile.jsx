@@ -26,6 +26,8 @@ const Profile = () => {
             try {
                 const response = await api.get(`/user/${userId}`);
 
+                console.log("Profile API response:", response.data);
+
                 const fetchedUser = response.data.data;
 
                 setProfileUser(fetchedUser);
@@ -139,7 +141,7 @@ const Profile = () => {
     const followersCount = profileUser?.followers?.length || 0;
     const followingCount = profileUser?.following?.length || 0;
 
-    if (loading || !profileUser) {
+    if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <p className="text-gray-500">
