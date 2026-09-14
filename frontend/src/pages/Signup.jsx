@@ -1,6 +1,7 @@
 import { useState } from "react"
 import api from '../services/api'
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 function Signup() {
   const [message, setMessage] = useState("");
@@ -8,7 +9,9 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navignate = useNavigate();
+  const { setUser } = useAuth();
+
+  const navigate  = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +25,10 @@ function Signup() {
     try {
       const response = await api.post("/auth/signup", formData);
 
-      navignate('/');
+      localStorage.setItem("token", response.data.accessToken);
+      setUser(response.data.data);
+
+      navigate ("/");
 
       setMessage(response.data.message);
       
