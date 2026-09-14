@@ -1,5 +1,5 @@
 import express from 'express';
-import { followUser, getAllUsers, getPost, searchUsers, unFollowUser, updateProfile, uploadProfileImage } from '../controllers/user.controller.js';
+import { followUser, getAllUsers, getFollowers, getFollowing, getPost, searchUsers, unFollowUser, updateProfile, uploadProfileImage } from '../controllers/user.controller.js';
 import { authenticate } from '../middleware/auth.protect.js';
 import upload from '../middleware/upload.middleware.js';
 
@@ -8,6 +8,10 @@ const router = express.Router();
 router.get('/search', authenticate, searchUsers);
 
 router.get('/:id', authenticate, getPost);
+
+router.get('/:userId/followers', authenticate, getFollowers);
+
+router.get('/:userId/following', authenticate, getFollowing);
 
 router.get('/', authenticate, getAllUsers);
 

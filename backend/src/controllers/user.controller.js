@@ -210,3 +210,48 @@ export const unFollowUser = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getFollowers = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).populate("followers", "name username");
+
+        if (!user) {
+            throw new AppError("User not found", 404);
+        }
+
+        console.log("userId: ", userId);
+        console.log("followers: ", user?.followers);
+
+        res.status(200).json({
+            message: "Fetched followers successfully",
+            data: user.followers
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getFollowing = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).populate("following", "name username");
+
+        if (!user) {
+            throw new AppError("User not found", 404);
+        }
+
+        console.log("userId:", userId);
+        console.log("following:", user?.following);
+
+        res.status(200).json({
+            message: "Fetched followers successfully",
+            data: user.following
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}

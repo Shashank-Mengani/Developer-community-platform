@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
@@ -11,6 +11,9 @@ const Profile = () => {
     const [posts, setPosts] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
+    const [followers, setFollowers] = useState([]);
+    const [showFollowers, setShowFollowers] = useState(false);
+    const [following, setFollowing] = useState([]);
 
     const navigate = useNavigate();
 
@@ -134,6 +137,42 @@ const Profile = () => {
         }
     };
 
+    const handleFollowers = async () => {
+        if (!userId) return;
+
+        try {
+            const response = await api.get(
+                `/user/${userId}/followers`
+            );
+
+            setFollowers(response.data.data || []);
+            setShowFollowers(true);
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to fetch followers"
+            );
+        }
+    };
+
+    const handleFollowing = async () => {
+        if(!useId) return;
+        try {
+            const response = await api.get(
+                `/user/${userId}/following`
+            );
+
+            setFollowing(response.data.data);
+
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                "Failed to fetch followings"
+            );
+        }
+    }
+
     const postsCount = posts.length;
 
     const followersCount = profileUser?.followers?.length || 0;
@@ -251,27 +290,110 @@ const Profile = () => {
 
                             {/* Followers */}
                             <div className="flex flex-col items-center">
-                                <strong className="text-lg font-bold text-gray-900">
-                                    {followersCount}
-                                </strong>
 
-                                <span className="text-sm text-gray-500">
-                                    Followers
-                                </span>
+                                <button
+                                    onClick={handleFollowers}
+                                    className="flex flex-col items-center hover:opacity-70"
+                                >
+                                    <strong className="text-lg font-bold text-gray-900">
+                                        {followersCount}
+                                    </strong>
+
+                                    <span className="text-sm text-gray-500">
+                                        Followers
+                                    </span>
+                                </button>
+
                             </div>
 
                             {/* Following */}
                             <div className="flex flex-col items-center">
-                                <strong className="text-lg font-bold text-gray-900">
-                                    {followingCount}
-                                </strong>
+                                <button 
+                                    onClick={handleFollowing}
+                                    className="flex flex-col items-center hover:opacity-70"
+                                >   
+                                    <strong className="text-lg font-bold text-gray-900">
+                                        {followingCount}
+                                    </strong>
 
-                                <span className="text-sm text-gray-500">
-                                    Following
-                                </span>
+                                    <span className="text-sm text-gray-500">
+                                        Following
+                                    </span>
+                                </button>    
                             </div>
 
                         </div>
+
+                        {/* Followers list */}
+                        {showFollowers && (
+                            <div className="mt-6 w-full border-t border-gray-200 pt-4">
+
+                                <div className="flex items-center justify-between mb-4">
+
+                                    <h2 className="text-lg font-semibold text-gray-900">
+                                        Followers
+                                    </h2>
+
+                                    <button
+                                        onClick={() => setShowFollowers(false)}
+                                        className="text-sm text-gray-500 hover:text-gray-900"
+                                    >
+                                        Close
+                                    </button>
+
+                                </div>
+
+                                {followers.length === 0 ? (
+                                    <p className="text-sm text-gray-500">
+                                        No followers yet.
+                                    </p>
+                                ) : (
+                                    <div className="space-y-3">
+
+                                        {followers.map((follower) => (
+                                            <div
+                                                key={follower._id}
+                                                className="flex items-center gap-3"
+                                            >
+
+                                                {/* Follower avatar */}
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
+
+                                                    {follower.avatar ? (
+                                                        <img
+                                                            src={follower.avatar}
+                                                            alt={follower.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        follower.name
+                                                            ?.charAt(0)
+                                                            .toUpperCase()
+                                                    )}
+
+                                                </div>
+
+                                                {/* Follower info */}
+                                                <div>
+                                                    <p className="font-medium text-gray-900">
+                                                        {follower.name}
+                                                    </p>
+
+                                                    {follower.username && (
+                                                        <p className="text-sm text-gray-500">
+                                                            @{follower.username}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                            </div>
+                                        ))}
+
+                                    </div>
+                                )}
+
+                            </div>
+                        )}
 
                     </div>
 
@@ -281,6 +403,7 @@ const Profile = () => {
 
         </div>
     );
-};
+
+    };
 
 export default Profile;
