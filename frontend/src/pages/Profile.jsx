@@ -55,7 +55,7 @@ const Profile = () => {
     // Fetch posts
     useEffect(() => {
         const fetchPosts = async () => {
-            if (!userId) return;
+            if (loading || !userId) return;
 
             try {
                 const response = await api.get(
@@ -74,7 +74,7 @@ const Profile = () => {
         };
 
         fetchPosts();
-    }, [userId]);
+    }, [userId, loading]);
 
     const handleFollow = async () => {
         if (!userId || followLoading) return;
