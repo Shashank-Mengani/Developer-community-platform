@@ -39,9 +39,7 @@ function App() {
                 <Route 
                     path="/" 
                     element={
-                        <ProtectedRoute>
                             <Home />
-                        </ProtectedRoute>
                     } />
 
                 <Route
@@ -72,9 +70,7 @@ function App() {
                 <Route
                     path="/profile"
                     element={
-                        <ProtectedRoute>
                             <Profile />
-                        </ProtectedRoute>
                     }
                 />
 
@@ -86,27 +82,21 @@ function App() {
                 <Route
                     path="/explore"
                     element={
-                        <ProtectedRoute>
                             <Explore />
-                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/notifications"
                     element={
-                        <ProtectedRoute>
                             <Notifications />
-                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/settings"
                     element={
-                        <ProtectedRoute>
                             <Settings />
-                        </ProtectedRoute>
                     }
                 />
 
