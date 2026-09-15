@@ -13,7 +13,7 @@ postRoute.post('/user/post', authenticate, upload.single("image"), validate(crea
 
 postRoute.post('/:id/reaction', validate(reactionSchema), authenticate, reactToPost);
 
-postRoute.get('/user/:id', authenticate, getPostsByUser);
+postRoute.get('/user/:userId', authenticate, getPostsByUser);
 
 postRoute.get('/:id/post', authenticate, getPostById);
 

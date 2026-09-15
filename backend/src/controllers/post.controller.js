@@ -52,7 +52,7 @@ export const createPost = async (req, res, next) => {
 
 export const getPostsByUser = async (req, res, next) => {
     try {
-        const userId = req.params.id;
+        const { userId } = req.params;
 
         const posts = await Post.find({
             author: userId
