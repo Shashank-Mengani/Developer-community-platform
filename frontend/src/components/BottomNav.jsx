@@ -76,7 +76,7 @@ const BottomNav = () => {
                     </span>
 
                     <span>
-                        Explore
+                        Questions
                     </span>
                 </button>
 

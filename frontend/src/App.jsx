@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import Signout from "./pages/Signout";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
-import Explore from "./pages/Explore";
+import Questions from "./pages/Questions";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Settings from "./pages/Settings";
 import Layout from "./layouts/Layout";
@@ -24,7 +24,7 @@ function App() {
 
                 <Route path="/signup" element={<Signup />} />
 
-                <Route path="/signin" element={<Login />} />
+                <Route path="/login" element={<Login />} />
 
                 <Route path="/signout" element={<Signout />} />
 
@@ -82,7 +82,7 @@ function App() {
                 <Route
                     path="/explore"
                     element={
-                            <Explore />
+                            <Questions />
                     }
                 />
 

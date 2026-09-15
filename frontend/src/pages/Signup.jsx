@@ -133,6 +133,20 @@ function Signup() {
           </button>
 
         </form>
+
+        {/* Log in Link */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            Already have an account?{" "}
+            <button 
+              type="button"
+              onClick={() => navigate("/login")}
+              className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
+            >
+                Log in
+              </button>
+          </p>
+        </div>
       </div>
     </div>
   );
