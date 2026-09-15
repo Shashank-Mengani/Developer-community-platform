@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
@@ -8,6 +8,8 @@ const Profile = () => {
     const { user: currentUser, loading } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
+
+    const fileInputRef = useRef(null);
 
     const [profileUser, setProfileUser] = useState(null);
     const [posts, setPosts] = useState([]);
@@ -23,14 +25,17 @@ const Profile = () => {
 
     const [showPosts, setShowPosts] = useState(false);
 
-    // If /profile/:id -> show that user
-    // If /profile -> show current logged-in user
+    const [uploadingImage, setUploadingImage] = useState(false);
+
     const userId = id || currentUser?._id;
 
     const isOwnProfile =
         currentUser?._id?.toString() === userId?.toString();
 
+    // --------------------------------------------------
     // Fetch profile
+    // --------------------------------------------------
+
     useEffect(() => {
         const fetchProfile = async () => {
             if (loading || !userId) return;
@@ -40,11 +45,8 @@ const Profile = () => {
 
                 console.log("PROFILE RESPONSE:", response.data);
 
-                const userData = response.data.data;
+                setProfileUser(response.data.data);
 
-                setProfileUser(userData);
-
-                // Check following status
                 if (
                     currentUser?._id &&
                     currentUser._id.toString() !== userId.toString()
@@ -74,7 +76,10 @@ const Profile = () => {
         fetchProfile();
     }, [userId, currentUser, loading]);
 
+    // --------------------------------------------------
     // Fetch posts
+    // --------------------------------------------------
+
     useEffect(() => {
         const fetchPosts = async () => {
             if (loading || !userId) return;
@@ -83,8 +88,6 @@ const Profile = () => {
                 const response = await api.get(
                     `/post/user/${userId}`
                 );
-
-                console.log("PROFILE POSTS:", response.data);
 
                 setPosts(response.data.data || []);
             } catch (error) {
@@ -100,7 +103,75 @@ const Profile = () => {
         fetchPosts();
     }, [userId, loading]);
 
+    // --------------------------------------------------
+    // Upload profile image
+    // --------------------------------------------------
+
+    const handleAvatarChange = async (event) => {
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        // Only allow images
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+
+            const formData = new FormData();
+
+            formData.append("avatar", file);
+
+            const response = await api.put(
+                "/user/profile-image",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            console.log(
+                "PROFILE IMAGE RESPONSE:",
+                response.data
+            );
+
+            const updatedUser = response.data.data;
+
+            // Update profile immediately
+            setProfileUser((prev) => ({
+                ...prev,
+                avatar: updatedUser.avatar,
+            }));
+
+            // Clear file input so the same image can
+            // be selected again if needed
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        } catch (error) {
+            console.log(
+                error.response?.data?.message ||
+                    "Failed to upload profile image"
+            );
+
+            alert(
+                error.response?.data?.message ||
+                    "Failed to upload profile image"
+            );
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    // --------------------------------------------------
     // Follow
+    // --------------------------------------------------
+
     const handleFollow = async () => {
         if (
             !userId ||
@@ -118,7 +189,6 @@ const Profile = () => {
 
             setIsFollowing(true);
 
-            // Update follower count immediately
             setProfileUser((prev) => {
                 if (!prev) return prev;
 
@@ -154,7 +224,10 @@ const Profile = () => {
         }
     };
 
+    // --------------------------------------------------
     // Unfollow
+    // --------------------------------------------------
+
     const handleUnfollow = async () => {
         if (
             !userId ||
@@ -172,7 +245,6 @@ const Profile = () => {
 
             setIsFollowing(false);
 
-            // Update follower count immediately
             setProfileUser((prev) => {
                 if (!prev) return prev;
 
@@ -197,25 +269,26 @@ const Profile = () => {
         }
     };
 
-    // Show posts
+    // --------------------------------------------------
+    // Posts
+    // --------------------------------------------------
+
     const handlePosts = () => {
         setShowPosts(true);
         setShowFollowers(false);
         setShowFollowing(false);
     };
 
-    // Fetch followers
+    // --------------------------------------------------
+    // Followers
+    // --------------------------------------------------
+
     const handleFollowers = async () => {
         if (!userId) return;
 
         try {
             const response = await api.get(
                 `/user/${userId}/followers`
-            );
-
-            console.log(
-                "FOLLOWERS RESPONSE:",
-                response.data
             );
 
             setFollowers(response.data.data || []);
@@ -231,18 +304,16 @@ const Profile = () => {
         }
     };
 
-    // Fetch following
+    // --------------------------------------------------
+    // Following
+    // --------------------------------------------------
+
     const handleFollowing = async () => {
         if (!userId) return;
 
         try {
             const response = await api.get(
                 `/user/${userId}/following`
-            );
-
-            console.log(
-                "FOLLOWING RESPONSE:",
-                response.data
             );
 
             setFollowing(response.data.data || []);
@@ -258,7 +329,10 @@ const Profile = () => {
         }
     };
 
+    // --------------------------------------------------
     // Counts
+    // --------------------------------------------------
+
     const postsCount = posts.length;
 
     const followersCount =
@@ -267,7 +341,10 @@ const Profile = () => {
     const followingCount =
         profileUser?.following?.length || 0;
 
+    // --------------------------------------------------
     // Loading
+    // --------------------------------------------------
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -278,7 +355,10 @@ const Profile = () => {
         );
     }
 
+    // --------------------------------------------------
     // No user
+    // --------------------------------------------------
+
     if (!userId) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -298,7 +378,10 @@ const Profile = () => {
         );
     }
 
+    // --------------------------------------------------
     // Profile not found
+    // --------------------------------------------------
+
     if (!profileUser) {
         return (
             <div className="min-h-screen bg-gray-100">
@@ -324,7 +407,6 @@ const Profile = () => {
         );
     }
 
-    // UI
     return (
         <div className="min-h-screen bg-gray-100">
 
@@ -347,22 +429,88 @@ const Profile = () => {
 
                     <div className="flex flex-col items-center">
 
-                        {/* Avatar */}
-                        <div className="w-24 h-24 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-3xl font-bold text-blue-600 mb-4">
+                        {/* Profile Image */}
 
-                            {profileUser.avatar ? (
-                                <img
-                                    src={profileUser.avatar}
-                                    alt={profileUser.name}
-                                    className="w-full h-full object-cover"
+                        <div className="relative mb-4">
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (isOwnProfile) {
+                                        fileInputRef.current?.click();
+                                    }
+                                }}
+                                disabled={
+                                    !isOwnProfile ||
+                                    uploadingImage
+                                }
+                                className={`relative w-24 h-24 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-3xl font-bold text-blue-600 ${
+                                    isOwnProfile
+                                        ? "cursor-pointer"
+                                        : "cursor-default"
+                                }`}
+                            >
+
+                                {profileUser.avatar ? (
+                                    <img
+                                        src={profileUser.avatar}
+                                        alt={profileUser.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    profileUser.name
+                                        ?.charAt(0)
+                                        .toUpperCase()
+                                )}
+
+                                {/* Upload overlay */}
+                                {isOwnProfile && (
+                                    <div className="absolute inset-0 flex items-end justify-center bg-black/0 hover:bg-black/30 transition">
+                                        <span className="mb-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white opacity-0 hover:opacity-100">
+                                            Change
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Uploading */}
+                                {uploadingImage && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                                        <span className="text-xs font-medium text-white">
+                                            Uploading...
+                                        </span>
+                                    </div>
+                                )}
+
+                            </button>
+
+                            {/* Hidden file input */}
+                            {isOwnProfile && (
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
                                 />
-                            ) : (
-                                profileUser.name
-                                    ?.charAt(0)
-                                    .toUpperCase()
                             )}
 
                         </div>
+
+                        {/* Change photo text */}
+                        {isOwnProfile && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    fileInputRef.current?.click()
+                                }
+                                disabled={uploadingImage}
+                                className="mb-3 text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                            >
+                                {uploadingImage
+                                    ? "Uploading..."
+                                    : "Change profile photo"}
+                            </button>
+                        )}
 
                         {/* Name */}
                         <h1 className="text-2xl font-bold text-gray-900">
@@ -383,7 +531,7 @@ const Profile = () => {
                             </p>
                         )}
 
-                        {/* Follow Button */}
+                        {/* Follow */}
                         {!isOwnProfile && (
                             <button
                                 onClick={
@@ -414,64 +562,46 @@ const Profile = () => {
                         <div className="flex items-center justify-center gap-10 mt-6">
 
                             {/* Posts */}
-                            <div className="flex flex-col items-center">
-                                <button
-                                    onClick={handlePosts}
-                                    className={`flex flex-col items-center transition ${
-                                        showPosts
-                                            ? "opacity-100"
-                                            : "hover:opacity-70"
-                                    }`}
-                                >
-                                    <strong className="text-lg font-bold text-gray-900">
-                                        {postsCount}
-                                    </strong>
+                            <button
+                                onClick={handlePosts}
+                                className="flex flex-col items-center hover:opacity-70"
+                            >
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {postsCount}
+                                </strong>
 
-                                    <span className="text-sm text-gray-500">
-                                        Posts
-                                    </span>
-                                </button>
-                            </div>
+                                <span className="text-sm text-gray-500">
+                                    Posts
+                                </span>
+                            </button>
 
                             {/* Followers */}
-                            <div className="flex flex-col items-center">
-                                <button
-                                    onClick={handleFollowers}
-                                    className={`flex flex-col items-center transition ${
-                                        showFollowers
-                                            ? "opacity-100"
-                                            : "hover:opacity-70"
-                                    }`}
-                                >
-                                    <strong className="text-lg font-bold text-gray-900">
-                                        {followersCount}
-                                    </strong>
+                            <button
+                                onClick={handleFollowers}
+                                className="flex flex-col items-center hover:opacity-70"
+                            >
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {followersCount}
+                                </strong>
 
-                                    <span className="text-sm text-gray-500">
-                                        Followers
-                                    </span>
-                                </button>
-                            </div>
+                                <span className="text-sm text-gray-500">
+                                    Followers
+                                </span>
+                            </button>
 
                             {/* Following */}
-                            <div className="flex flex-col items-center">
-                                <button
-                                    onClick={handleFollowing}
-                                    className={`flex flex-col items-center transition ${
-                                        showFollowing
-                                            ? "opacity-100"
-                                            : "hover:opacity-70"
-                                    }`}
-                                >
-                                    <strong className="text-lg font-bold text-gray-900">
-                                        {followingCount}
-                                    </strong>
+                            <button
+                                onClick={handleFollowing}
+                                className="flex flex-col items-center hover:opacity-70"
+                            >
+                                <strong className="text-lg font-bold text-gray-900">
+                                    {followingCount}
+                                </strong>
 
-                                    <span className="text-sm text-gray-500">
-                                        Following
-                                    </span>
-                                </button>
-                            </div>
+                                <span className="text-sm text-gray-500">
+                                    Following
+                                </span>
+                            </button>
 
                         </div>
 
@@ -479,7 +609,6 @@ const Profile = () => {
                 </div>
 
                 {/* Posts */}
-
                 {showPosts && (
                     <div className="mt-6">
 
@@ -506,14 +635,12 @@ const Profile = () => {
                             </div>
                         ) : (
                             <div className="space-y-6">
-
                                 {posts.map((post) => (
                                     <PostCard
                                         key={post._id}
                                         post={post}
                                     />
                                 ))}
-
                             </div>
                         )}
 
@@ -521,7 +648,6 @@ const Profile = () => {
                 )}
 
                 {/* Followers */}
-
                 {showFollowers && (
                     <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
 
@@ -556,7 +682,6 @@ const Profile = () => {
                                             className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
                                         >
 
-                                            {/* Avatar */}
                                             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
 
                                                 {follower.avatar ? (
@@ -571,20 +696,15 @@ const Profile = () => {
                                                     />
                                                 ) : (
                                                     follower.name
-                                                        ?.charAt(
-                                                            0
-                                                        )
+                                                        ?.charAt(0)
                                                         .toUpperCase()
                                                 )}
 
                                             </div>
 
-                                            {/* User Info */}
                                             <div>
                                                 <p className="font-medium text-gray-900">
-                                                    {
-                                                        follower.name
-                                                    }
+                                                    {follower.name}
                                                 </p>
 
                                                 {follower.username && (
@@ -608,7 +728,6 @@ const Profile = () => {
                 )}
 
                 {/* Following */}
-
                 {showFollowing && (
                     <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
 
@@ -645,7 +764,6 @@ const Profile = () => {
                                             className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
                                         >
 
-                                            {/* Avatar */}
                                             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
 
                                                 {followingUser.avatar ? (
@@ -660,15 +778,12 @@ const Profile = () => {
                                                     />
                                                 ) : (
                                                     followingUser.name
-                                                        ?.charAt(
-                                                            0
-                                                        )
+                                                        ?.charAt(0)
                                                         .toUpperCase()
                                                 )}
 
                                             </div>
 
-                                            {/* User Info */}
                                             <div>
                                                 <p className="font-medium text-gray-900">
                                                     {
