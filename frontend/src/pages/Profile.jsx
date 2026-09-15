@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Camera } from "lucide-react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
@@ -10,6 +11,7 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const fileInputRef = useRef(null);
+    const photoMenuRef = useRef(null);
 
     const [profileUser, setProfileUser] = useState(null);
     const [posts, setPosts] = useState([]);
@@ -27,29 +29,60 @@ const Profile = () => {
 
     const [uploadingImage, setUploadingImage] = useState(false);
 
+    // Profile photo menu / preview
+    const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+    const [showPhotoPreview, setShowPhotoPreview] = useState(false);
+
     const userId = id || currentUser?._id;
 
     const isOwnProfile =
         currentUser?._id?.toString() === userId?.toString();
 
-    // --------------------------------------------------
-    // Fetch profile
-    // --------------------------------------------------
+    // Close photo menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                photoMenuRef.current &&
+                !photoMenuRef.current.contains(event.target)
+            ) {
+                setShowPhotoMenu(false);
+            }
+        };
 
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
+
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+        };
+    }, []);
+
+    // Fetch profile
     useEffect(() => {
         const fetchProfile = async () => {
             if (loading || !userId) return;
 
             try {
-                const response = await api.get(`/user/${userId}`);
+                const response = await api.get(
+                    `/user/${userId}`
+                );
 
-                console.log("PROFILE RESPONSE:", response.data);
+                console.log(
+                    "PROFILE RESPONSE:",
+                    response.data
+                );
 
                 setProfileUser(response.data.data);
 
                 if (
                     currentUser?._id &&
-                    currentUser._id.toString() !== userId.toString()
+                    currentUser._id.toString() !==
+                        userId.toString()
                 ) {
                     const followingUser =
                         currentUser.following?.some(
@@ -76,10 +109,7 @@ const Profile = () => {
         fetchProfile();
     }, [userId, currentUser, loading]);
 
-    // --------------------------------------------------
     // Fetch posts
-    // --------------------------------------------------
-
     useEffect(() => {
         const fetchPosts = async () => {
             if (loading || !userId) return;
@@ -103,10 +133,13 @@ const Profile = () => {
         fetchPosts();
     }, [userId, loading]);
 
-    // --------------------------------------------------
-    // Upload profile image
-    // --------------------------------------------------
+    // Open file picker
+    const handleGalleryClick = () => {
+        setShowPhotoMenu(false);
+        fileInputRef.current?.click();
+    };
 
+    // Profile image upload
     const handleAvatarChange = async (event) => {
         const file = event.target.files?.[0];
 
@@ -115,6 +148,14 @@ const Profile = () => {
         // Only allow images
         if (!file.type.startsWith("image/")) {
             alert("Please select an image file.");
+            return;
+        }
+
+        // Maximum 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert(
+                "Please select an image smaller than 5MB."
+            );
             return;
         }
 
@@ -130,7 +171,8 @@ const Profile = () => {
                 formData,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type":
+                            "multipart/form-data",
                     },
                 }
             );
@@ -142,14 +184,12 @@ const Profile = () => {
 
             const updatedUser = response.data.data;
 
-            // Update profile immediately
             setProfileUser((prev) => ({
                 ...prev,
                 avatar: updatedUser.avatar,
             }));
 
-            // Clear file input so the same image can
-            // be selected again if needed
+            // Clear input
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
@@ -168,10 +208,7 @@ const Profile = () => {
         }
     };
 
-    // --------------------------------------------------
     // Follow
-    // --------------------------------------------------
-
     const handleFollow = async () => {
         if (
             !userId ||
@@ -224,10 +261,7 @@ const Profile = () => {
         }
     };
 
-    // --------------------------------------------------
     // Unfollow
-    // --------------------------------------------------
-
     const handleUnfollow = async () => {
         if (
             !userId ||
@@ -241,7 +275,9 @@ const Profile = () => {
         try {
             setFollowLoading(true);
 
-            await api.delete(`/user/unfollow/${userId}`);
+            await api.delete(
+                `/user/unfollow/${userId}`
+            );
 
             setIsFollowing(false);
 
@@ -269,20 +305,14 @@ const Profile = () => {
         }
     };
 
-    // --------------------------------------------------
     // Posts
-    // --------------------------------------------------
-
     const handlePosts = () => {
         setShowPosts(true);
         setShowFollowers(false);
         setShowFollowing(false);
     };
 
-    // --------------------------------------------------
     // Followers
-    // --------------------------------------------------
-
     const handleFollowers = async () => {
         if (!userId) return;
 
@@ -304,10 +334,7 @@ const Profile = () => {
         }
     };
 
-    // --------------------------------------------------
     // Following
-    // --------------------------------------------------
-
     const handleFollowing = async () => {
         if (!userId) return;
 
@@ -329,10 +356,7 @@ const Profile = () => {
         }
     };
 
-    // --------------------------------------------------
     // Counts
-    // --------------------------------------------------
-
     const postsCount = posts.length;
 
     const followersCount =
@@ -341,10 +365,7 @@ const Profile = () => {
     const followingCount =
         profileUser?.following?.length || 0;
 
-    // --------------------------------------------------
     // Loading
-    // --------------------------------------------------
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -355,10 +376,7 @@ const Profile = () => {
         );
     }
 
-    // --------------------------------------------------
     // No user
-    // --------------------------------------------------
-
     if (!userId) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -378,10 +396,7 @@ const Profile = () => {
         );
     }
 
-    // --------------------------------------------------
     // Profile not found
-    // --------------------------------------------------
-
     if (!profileUser) {
         return (
             <div className="min-h-screen bg-gray-100">
@@ -430,31 +445,43 @@ const Profile = () => {
                     <div className="flex flex-col items-center">
 
                         {/* Profile Image */}
+                        <div
+                            ref={photoMenuRef}
+                            className="relative mb-3"
+                        >
 
-                        <div className="relative mb-4">
-
+                            {/* Profile Photo */}
                             <button
                                 type="button"
                                 onClick={() => {
-                                    if (isOwnProfile) {
-                                        fileInputRef.current?.click();
+                                    if (
+                                        profileUser.avatar &&
+                                        !uploadingImage
+                                    ) {
+                                        setShowPhotoPreview(
+                                            true
+                                        );
                                     }
                                 }}
                                 disabled={
-                                    !isOwnProfile ||
                                     uploadingImage
                                 }
-                                className={`relative w-24 h-24 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-3xl font-bold text-blue-600 ${
-                                    isOwnProfile
+                                className={`relative w-28 h-28 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-600 shadow-sm ${
+                                    uploadingImage
+                                        ? "cursor-wait"
+                                        : profileUser.avatar
                                         ? "cursor-pointer"
                                         : "cursor-default"
                                 }`}
                             >
-
                                 {profileUser.avatar ? (
                                     <img
-                                        src={profileUser.avatar}
-                                        alt={profileUser.name}
+                                        src={
+                                            profileUser.avatar
+                                        }
+                                        alt={
+                                            profileUser.name
+                                        }
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -463,54 +490,87 @@ const Profile = () => {
                                         .toUpperCase()
                                 )}
 
-                                {/* Upload overlay */}
-                                {isOwnProfile && (
-                                    <div className="absolute inset-0 flex items-end justify-center bg-black/0 hover:bg-black/30 transition">
-                                        <span className="mb-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white opacity-0 hover:opacity-100">
-                                            Change
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Uploading */}
+                                {/* Uploading Overlay */}
                                 {uploadingImage && (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                        <span className="text-xs font-medium text-white">
-                                            Uploading...
-                                        </span>
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                                        <div className="text-center">
+                                            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-1" />
+
+                                            <span className="text-xs font-medium text-white">
+                                                Uploading
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
-
                             </button>
 
-                            {/* Hidden file input */}
+                            {/* Green Camera Button */}
+                            {isOwnProfile &&
+                                !uploadingImage && (
+                                    <button
+                                        type="button"
+                                        onClick={(
+                                            event
+                                        ) => {
+                                            event.stopPropagation();
+
+                                            setShowPhotoMenu(
+                                                (prev) =>
+                                                    !prev
+                                            );
+                                        }}
+                                        className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-green-400 text-white shadow-md transition hover:bg-green-500 active:scale-95"
+                                        aria-label="Change profile photo"
+                                    >
+                                        <Camera
+                                            size={18}
+                                            strokeWidth={
+                                                2.5
+                                            }
+                                        />
+                                    </button>
+                                )}
+
+                            {/* WhatsApp-style Photo Menu */}
+                            {isOwnProfile &&
+                                showPhotoMenu && (
+                                    <div className="absolute left-1/2 top-full z-30 mt-3 w-52 -translate-x-1/2 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+
+                                        {/* Choose From Gallery */}
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                handleGalleryClick
+                                            }
+                                            className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 transition hover:bg-gray-50"
+                                        >
+                                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-base">
+                                                🖼️
+                                            </span>
+
+                                            <span>
+                                                Choose
+                                                from gallery
+                                            </span>
+                                        </button>
+                                    </div>
+                                )}
+
+                            {/* Hidden File Input */}
                             {isOwnProfile && (
                                 <input
-                                    ref={fileInputRef}
+                                    ref={
+                                        fileInputRef
+                                    }
                                     type="file"
                                     accept="image/*"
-                                    onChange={handleAvatarChange}
+                                    onChange={
+                                        handleAvatarChange
+                                    }
                                     className="hidden"
                                 />
                             )}
-
                         </div>
-
-                        {/* Change photo text */}
-                        {isOwnProfile && (
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    fileInputRef.current?.click()
-                                }
-                                disabled={uploadingImage}
-                                className="mb-3 text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
-                            >
-                                {uploadingImage
-                                    ? "Uploading..."
-                                    : "Change profile photo"}
-                            </button>
-                        )}
 
                         {/* Name */}
                         <h1 className="text-2xl font-bold text-gray-900">
@@ -539,7 +599,9 @@ const Profile = () => {
                                         ? handleUnfollow
                                         : handleFollow
                                 }
-                                disabled={followLoading}
+                                disabled={
+                                    followLoading
+                                }
                                 className={`mt-5 rounded-lg px-6 py-2 text-sm font-medium transition ${
                                     isFollowing
                                         ? "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
@@ -577,7 +639,9 @@ const Profile = () => {
 
                             {/* Followers */}
                             <button
-                                onClick={handleFollowers}
+                                onClick={
+                                    handleFollowers
+                                }
                                 className="flex flex-col items-center hover:opacity-70"
                             >
                                 <strong className="text-lg font-bold text-gray-900">
@@ -591,7 +655,9 @@ const Profile = () => {
 
                             {/* Following */}
                             <button
-                                onClick={handleFollowing}
+                                onClick={
+                                    handleFollowing
+                                }
                                 className="flex flex-col items-center hover:opacity-70"
                             >
                                 <strong className="text-lg font-bold text-gray-900">
@@ -602,9 +668,7 @@ const Profile = () => {
                                     Following
                                 </span>
                             </button>
-
                         </div>
-
                     </div>
                 </div>
 
@@ -643,7 +707,6 @@ const Profile = () => {
                                 ))}
                             </div>
                         )}
-
                     </div>
                 )}
 
@@ -652,20 +715,20 @@ const Profile = () => {
                     <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
 
                         <div className="flex items-center justify-between mb-4">
-
                             <h2 className="text-lg font-semibold text-gray-900">
                                 Followers
                             </h2>
 
                             <button
                                 onClick={() =>
-                                    setShowFollowers(false)
+                                    setShowFollowers(
+                                        false
+                                    )
                                 }
                                 className="text-sm text-gray-500 hover:text-gray-900"
                             >
                                 Close
                             </button>
-
                         </div>
 
                         {followers.length === 0 ? (
@@ -674,16 +737,15 @@ const Profile = () => {
                             </p>
                         ) : (
                             <div className="space-y-3">
-
                                 {followers.map(
                                     (follower) => (
                                         <div
-                                            key={follower._id}
+                                            key={
+                                                follower._id
+                                            }
                                             className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
                                         >
-
                                             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
-
                                                 {follower.avatar ? (
                                                     <img
                                                         src={
@@ -696,15 +758,18 @@ const Profile = () => {
                                                     />
                                                 ) : (
                                                     follower.name
-                                                        ?.charAt(0)
+                                                        ?.charAt(
+                                                            0
+                                                        )
                                                         .toUpperCase()
                                                 )}
-
                                             </div>
 
                                             <div>
                                                 <p className="font-medium text-gray-900">
-                                                    {follower.name}
+                                                    {
+                                                        follower.name
+                                                    }
                                                 </p>
 
                                                 {follower.username && (
@@ -716,14 +781,11 @@ const Profile = () => {
                                                     </p>
                                                 )}
                                             </div>
-
                                         </div>
                                     )
                                 )}
-
                             </div>
                         )}
-
                     </div>
                 )}
 
@@ -732,20 +794,20 @@ const Profile = () => {
                     <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
 
                         <div className="flex items-center justify-between mb-4">
-
                             <h2 className="text-lg font-semibold text-gray-900">
                                 Following
                             </h2>
 
                             <button
                                 onClick={() =>
-                                    setShowFollowing(false)
+                                    setShowFollowing(
+                                        false
+                                    )
                                 }
                                 className="text-sm text-gray-500 hover:text-gray-900"
                             >
                                 Close
                             </button>
-
                         </div>
 
                         {following.length === 0 ? (
@@ -754,18 +816,17 @@ const Profile = () => {
                             </p>
                         ) : (
                             <div className="space-y-3">
-
                                 {following.map(
-                                    (followingUser) => (
+                                    (
+                                        followingUser
+                                    ) => (
                                         <div
                                             key={
                                                 followingUser._id
                                             }
                                             className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
                                         >
-
                                             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 overflow-hidden">
-
                                                 {followingUser.avatar ? (
                                                     <img
                                                         src={
@@ -778,10 +839,11 @@ const Profile = () => {
                                                     />
                                                 ) : (
                                                     followingUser.name
-                                                        ?.charAt(0)
+                                                        ?.charAt(
+                                                            0
+                                                        )
                                                         .toUpperCase()
                                                 )}
-
                                             </div>
 
                                             <div>
@@ -800,18 +862,51 @@ const Profile = () => {
                                                     </p>
                                                 )}
                                             </div>
-
                                         </div>
                                     )
                                 )}
-
                             </div>
                         )}
-
                     </div>
                 )}
-
             </main>
+
+            {/* Full-Screen Profile Photo */}
+            {showPhotoPreview &&
+                profileUser.avatar && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+                        onClick={() =>
+                            setShowPhotoPreview(
+                                false
+                            )
+                        }
+                    >
+                        {/* Close Button */}
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setShowPhotoPreview(
+                                    false
+                                )
+                            }
+                            className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20"
+                            aria-label="Close photo"
+                        >
+                            ×
+                        </button>
+
+                        {/* Full Image */}
+                        <img
+                            src={profileUser.avatar}
+                            alt={profileUser.name}
+                            onClick={(event) =>
+                                event.stopPropagation()
+                            }
+                            className="max-h-[90vh] max-w-full rounded-lg object-contain shadow-2xl"
+                        />
+                    </div>
+                )}
         </div>
     );
 };
