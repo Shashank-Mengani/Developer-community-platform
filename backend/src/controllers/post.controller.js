@@ -56,7 +56,7 @@ export const getPostsByUser = async (req, res, next) => {
 
         const posts = await Post.find({
             author: userId
-        }).populate("author", "name username").sort({ createdAt: -1 });
+        }).populate("author", "name username avatar").sort({ createdAt: -1 });
 
         res.status(200).json({
             message: "User posts fetched successfully",
