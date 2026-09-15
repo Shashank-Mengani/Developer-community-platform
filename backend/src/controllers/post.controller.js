@@ -71,7 +71,7 @@ export const getPostsByUser = async (req, res, next) => {
 export const getAllPosts = async (req, res, next) => {
     try {
         const posts = await Post.find()
-                .populate("author", "name username")
+                .populate("author", "name username avatar")
                 .sort({ createdAt: -1 });
                
         return res.status(200).json({
@@ -143,7 +143,7 @@ export const reactToPost = async(req, res, next) => {
         const postId = req.params.id;
         const { type } = req.body;
 
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate("author", "name username avatar");
 
         if(!post){
             throw new AppError("Post not found", 404);
